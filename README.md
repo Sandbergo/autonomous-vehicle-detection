@@ -37,7 +37,7 @@ sudo apt-get install python3.7
 sudo apt-get install python3-pip
 sudo apt-get update
 sudo apt-get install python3-venv
-git clone https://github.com/sandbego/autonomous-vehicle-detector
+git clone https://github.com/Sandbergo/autonomous-vehicle-detector
 cd autonomous-vehicle-detector
 python3 -m venv env
 source env/bin/activate
@@ -76,4 +76,4 @@ use & abuse
 - Olav Pedersen [@olavpe](https://github.com/olavpe)
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
-- Håkon Hukkelås [@Sandbergo](https://github.com/hukkelas)
+- Håkon Hukkelås [@hukkelas](https://github.com/hukkelas)
