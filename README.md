@@ -28,22 +28,34 @@ Lets go bois
 ## 🏁 Getting Started <a name = "getting_started"></a>
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
 
-
-### Prerequisites
-All requirements listed in the 'requirements.txt'-file, simply run the following commands:
-
 ```
-sudo apt-get install python3.7
-sudo apt-get install python3-pip
-sudo apt-get update
-sudo apt-get install python3-venv
+ssh username@clab[00-25].idi.ntnu.no
+mk_work_dir
+cd ../../../../work/username
+rm -rf . // dobbeltsjekk denne kommandoen hehe
 git clone https://github.com/Sandbergo/autonomous-vehicle-detector
-cd autonomous-vehicle-detector
-python3 -m venv env
-source env/bin/activate
-cd SSD
-pip3 install -r requirements.txt
+cd autonomous-vehicle-detector/SSD
+pip3 install --user -r requirements.txt
+python3 setup_waymo.py
+python3 train.py configs/train_waymo.yaml
+python3 update_tdt4265_dataset.py
+python3 train.py configs/train_tdt4265.yaml
+python3 submit_results.py configs/train_tdt4265.yaml
 ```
+
+Remember to refresh file explorer if working on VS Code server with SSH - remote extension
+
+### Access Tensorboard
+First, on terminal in Cybele:
+```
+tensorboard --logdir outputs
+```
+Note the resulting port XXXX.
+Then, on a separate terminal running on local computer: 
+```
+ssh -L 127.0.0.1:6008:127.0.0.1:XXXX username@clab[00-25].idi.ntnu.no
+```
+Acess on localhost:6008
 
 ### File Structure
 
@@ -53,14 +65,13 @@ The hierarchy should look like this:
     ├── papers                              
     │     └── ...
     ├── SSD                     
-    │     ├── data_description.txt
-    │     └── train.csv
+    │     ├── configs
+    │     └── requirements.txt
     |
     ├── .gitignore
     ├── LICENSE
-    ├── README.md
-    └── requirements.txt
-
+    └── README.md
+    
 
 ## 🎈 Usage <a name="usage"></a>
 use & abuse
