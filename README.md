@@ -35,7 +35,13 @@ cd ../../../../work/username
 rm -rf . // dobbeltsjekk denne kommandoen hehe
 git clone https://github.com/Sandbergo/autonomous-vehicle-detector
 cd autonomous-vehicle-detector/SSD
+rm -rf ~/.local/lib/python3.6/site-packages/
+rm -rf ~/.local/lib/python2.7/site-packages/
+pip3 install --user torch torchvision
 pip3 install --user -r requirements.txt
+pip3 install --user --upgrade torch torchvision
+pip3 install --user tensorflow
+pip3 install --upgrade --user pandas
 python3 setup_waymo.py
 python3 train.py configs/train_waymo.yaml
 python3 update_tdt4265_dataset.py
