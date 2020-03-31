@@ -28,7 +28,7 @@ Lets go bois
 ## 🏁 Getting Started <a name = "getting_started"></a>
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
 
-```
+```bash
 ssh username@clab[00-25].idi.ntnu.no
 mk_work_dir
 cd ../../../../work/username
@@ -50,6 +50,32 @@ python3 submit_results.py configs/train_tdt4265.yaml
 ```
 
 Remember to refresh file explorer if working on VS Code server with SSH - remote extension
+
+### Using the Anaconda 'TermProject' Environment
+
+Follow the above instructions to after cloning the github repository. Make your way to the ```anaconda_setup``` and run the ```install_anaconda_env.sh``` *AS SPECFIED*. This script will create a user install of anaconda at ```/work/<user-name>/anaconda```. The script also updates both the *waymo* and the *tdt4265* datasets.
+
+```bash
+cd autonomous-vehicle-detector/anaconda_setup
+source install_conda_env.sh
+```
+
+After the script has the conda environment should already be activated. If using bash as the default shell you should see '(TermProject)' infront of the terminal prompt.
+
+The ```autonomous-vehicle-detection/anaconda_setup/TermProject.yaml``` is 'symlinked' to the anaconda install created. This means that if a change is made in the .yaml file, the conda environment can be updated by running 
+
+```bash
+conda env update –f TermProject.yml –n TermProject --prune
+```
+
+#### Some useful conda commands
+
+```bash
+conda activate TermProject
+conda deactivate
+conda list  #shows installed packages
+conda env list  #shows conda environments on machine
+```
 
 ### Access Tensorboard
 First, on terminal in Cybele:
