@@ -25,7 +25,7 @@ class BasicModel(torch.nn.Module):
 
         # improved model
         self.f1 = torch.nn.Sequential(torch.nn.Conv2d(
-                in_channels=3,
+                in_channels=image_channels,
                 out_channels=64,
                 kernel_size=kernel_size,
                 stride=1,
