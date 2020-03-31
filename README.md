@@ -67,16 +67,104 @@ Acess on localhost:6008
 
 The hierarchy should look like this:
 
-    .
-    ├── papers                              
-    │     └── ...
-    ├── SSD                     
-    │     ├── configs
-    │     └── requirements.txt
-    |
-    ├── .gitignore
+    ./
     ├── LICENSE
-    └── README.md
+    ├── papers
+    │   └── project.pdf
+    ├── README.md
+    └── SSD
+        ├── configs
+        │   ├── train_tdt4265.yaml
+        │   └── train_waymo.yaml
+        ├── demo.ipynb
+        ├── demo.py
+        ├── demo_video.py
+        ├── download_waymo.py
+        ├── plot_scalars.ipynb
+        ├── README.md
+        ├── requirements.txt
+        ├── setup_waymo.py
+        ├── ssd
+        │   ├── config
+        │   │   ├── defaults.py
+        │   │   └── path_catlog.py
+        │   ├── container.py
+        │   ├── data
+        │   │   ├── build.py
+        │   │   ├── datasets
+        │   │   │   ├── evaluation
+        │   │   │   │   ├── coco
+        │   │   │   │   │   └── __init__.py
+        │   │   │   │   ├── __init__.py
+        │   │   │   │   ├── mnist
+        │   │   │   │   │   └── __init__.py
+        │   │   │   │   ├── voc
+        │   │   │   │   │   ├── eval_detection_voc.py
+        │   │   │   │   │   └── __init__.py
+        │   │   │   │   └── waymo
+        │   │   │   │       └── __init__.py
+        │   │   │   ├── __init__.py
+        │   │   │   ├── mnist_object_detection
+        │   │   │   │   ├── mnist_object_dataset.py
+        │   │   │   │   ├── mnist.py
+        │   │   │   │   └── visualize_dataset.py
+        │   │   │   ├── tdt4265.py
+        │   │   │   └── waymo.py
+        │   │   ├── samplers.py
+        │   │   └── transforms
+        │   │       ├── __init__.py
+        │   │       ├── target_transform.py
+        │   │       └── transforms.py
+        │   ├── engine
+        │   │   ├── inference.py
+        │   │   └── trainer.py
+        │   ├── modeling
+        │   │   ├── backbone
+        │   │   │   ├── basic.py
+        │   │   │   └── vgg.py
+        │   │   ├── box_head
+        │   │   │   ├── box_head.py
+        │   │   │   ├── inference.py
+        │   │   │   ├── loss.py
+        │   │   │   └── prior_box.py
+        │   │   └── detector.py
+        │   ├── solver
+        │   │   ├── build.py
+        │   │   └── lr_scheduler.py
+        │   ├── torch_utils.py
+        │   └── utils
+        │       ├── box_utils.py
+        │       ├── checkpoint.py
+        │       ├── logger.py
+        │       ├── metric_logger.py
+        │       ├── model_zoo.py
+        │       └── nms.py
+        ├── submit_results.py
+        ├── test.ipynb
+        ├── test.py
+        ├── train.ipynb
+        ├── train.py
+        ├── tutorials
+        │   ├── annotation_images
+        │   │   ├── canvas_completed.png
+        │   │   ├── canvas.png
+        │   │   ├── canvas_shape_part1.png
+        │   │   ├── canvas_shape_part2.png
+        │   │   ├── canvas_shape_part3.png
+        │   │   ├── create_shape.png
+        │   │   ├── login_edit.png
+        │   │   ├── task_assignee_edit.png
+        │   │   └── tasks_edit.png
+        │   ├── annotation_tutorial.md
+        │   ├── dataset.md
+        │   ├── environment_setup.md
+        │   ├── evaluation_tdt4265.md
+        │   ├── run.md
+        │   └── tensorboard.md
+        ├── update_tdt4265_dataset.py
+        ├── visualize_dataset.ipynb
+        └── visualize_dataset.py
+
     
 
 ## 🎈 Usage <a name="usage"></a>
