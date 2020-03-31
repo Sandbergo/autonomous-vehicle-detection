@@ -13,7 +13,7 @@
 
 # Setting work_dir folder
 if [ -z "$1" ]; then
-    user=whoami
+    user=$(whoami)
     echo "No argument passed, using default: $user"
 else
     user=$1
@@ -25,13 +25,19 @@ if [[ ! -d /work/$user/anaconda ]]; then
     echo "The directory anaconda doesn't exists, installing anaconda to /work/$user/anaconda"
 
     # Downloading Anaconda
-    cd ~/Downloads
-    wget https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
+    if [[ ! -f ~/Downloads/Anaconda3-2020.02-Linux-x86_64.sh ]]; then
+        echo "### --------------------- Downloading Anaconda --------------------- ###"
+        cd ~/Downloads
+        wget https://repo.anaconda.com/archive/Anaconda3-2020.02-Linux-x86_64.sh
+    fi
 
     # This installs anaconda in silent mode to the work directory
-    mkdir /work/$user/anaconda
+    #mkdir /work/$user/anaconda
+    cd ~/Downloads
+    echo "### --------------------- Installing Anaconda --------------------- ###"
     bash Anaconda3-2020.02-Linux-x86_64.sh -b -p /work/$user/anaconda
-    eval "$(/work/$user/anaconda/bin/conda shell.bash hook)"
+    source /work/olavlp/anaconda/etc/profile.d/conda.sh
+    # eval "$(/work/$user/anaconda/bin/conda shell.bash hook)"
 
     # This adds conda path to your shells "--rc" file.
     conda init
@@ -40,10 +46,16 @@ else
 fi
 
 # Create a symbolic link from github repo .yaml file so that any changes to the yaml file can update environment
-if [[ ! -d /work/$user/anaconda/envs/ ]]; then
-    mkdir -p /work/$user/anaconda/envs/
+if [[ ! -d /work/$user/anaconda/envs/TermProject ]]; then
+    mkdir -p /work/$user/anaconda/envs/TermProject
 fi
-cd /work/$user/anaconda/envs/
+cd /work/$user/anaconda/envs/TermProject
 ln -s /work/$user/autonomous-vehicle-detection/anaconda_setup/TermProject.yaml
 conda env create -f TermProject.yaml
+conda activate TermProject
 
+# Downloading the datasets
+echo "### --------------------- Updating Datsets --------------------- ###"
+cd /work/$user/autonomous-vehicle-detection/SSD/
+python3 setup_waymo.py
+python3 update_tdt4265_dataset.py
