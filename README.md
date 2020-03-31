@@ -53,14 +53,17 @@ Remember to refresh file explorer if working on VS Code server with SSH - remote
 
 ### Using the Anaconda 'TermProject' Environment
 
-Follow the above instructions to after cloning the github repository. Make your way to the ```anaconda_setup``` and run the ```install_anaconda_env.sh``` *AS SPECFIED*. This script will create a user install of anaconda at ```/work/<user-name>/anaconda```. The script also updates both the *waymo* and the *tdt4265* datasets.
+Follow the above instructions to after cloning the github repository. Make your way to the ```anaconda_setup``` and run ```install_anaconda_env.sh``` *AS SPECFIED*. This script will create a user install of anaconda at ```/work/<user-name>/anaconda```. The script also updates both the *waymo* and the *tdt4265* datasets. If you have named your 'mk_work_dir' something other than your username, the name can be passed as an argument into the bash script.
 
 ```bash
 cd autonomous-vehicle-detector/anaconda_setup
 source install_conda_env.sh
+
+# If you have an alternate folder name
+source install_conda_env.sh <alternate-folder-name>
 ```
 
-After the script has the conda environment should already be activated. If using bash as the default shell you should see '(TermProject)' infront of the terminal prompt.
+The conda environment should already be activated after running the install script above. If using bash as the default shell you should see '(TermProject)' infront of the terminal prompt. You should be good to go!
 
 The ```autonomous-vehicle-detection/anaconda_setup/TermProject.yaml``` is 'symlinked' to the anaconda install created. This means that if a change is made in the .yaml file, the conda environment can be updated by running 
 
@@ -73,6 +76,7 @@ conda env update –f TermProject.yml –n TermProject --prune
 ```bash
 conda activate TermProject
 conda deactivate
+conda info #information about current conda environment
 conda list  #shows installed packages
 conda env list  #shows conda environments on machine
 ```
