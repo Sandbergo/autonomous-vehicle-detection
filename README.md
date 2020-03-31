@@ -33,7 +33,7 @@ ssh username@clab[00-25].idi.ntnu.no
 mk_work_dir
 cd ../../../../work/username
 rm -rf . // dobbeltsjekk denne kommandoen hehe
-git clone https://github.com/Sandbergo/autonomous-vehicle-detector
+git clone https://github.com/Sandbergo/autonomous-vehicle-detection.git
 cd autonomous-vehicle-detector/SSD
 rm -rf ~/.local/lib/python3.6/site-packages/
 rm -rf ~/.local/lib/python2.7/site-packages/
