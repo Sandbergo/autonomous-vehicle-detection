@@ -7,6 +7,10 @@ import moviepy.editor as mp
 import tempfile
 from demo import run_demo
 
+# Fix to the given starter code which was unable to run (PngImageFile object as no attribute '_PngImageFile_frame')
+import numpy as np
+import glob
+
 
 def dump_frames(video, directory: pathlib.Path):
     for frame_idx, frame in enumerate(
@@ -39,8 +43,30 @@ def infer_video(
         impaths = list(output_image_dir.glob("*.png"))
         impaths.sort(key=lambda impath: int(impath.stem))
         impaths = [str(impath) for impath in impaths]
-        with mp.ImageSequenceClip(impaths, fps=original_fps) as video:
-            video.write_videofile(output_path)
+
+        # The commended out code belongs to the starter code, but is not working properly
+        # with mp.ImageSequenceClip(impaths, fps=original_fps) as video:
+        #     video.write_videofile(output_path)
+
+        # Fix. Adapted from https://theailearner.com/2018/10/15/creating-video-from-images-using-opencv-python/
+        img_array = []
+        size = (0,0)
+        for filepath in impaths:
+            img = cv2.imread(filepath)
+            img_array.append(img)
+            height, width, _ = img.shape
+            size = (width, height)
+        
+        out = cv2.VideoWriter(
+            output_path,
+            cv2.VideoWriter_fourcc(*'mp4v'),
+            original_fps,
+            size
+        )
+
+        for i in range(len(img_array)):
+            out.write(img_array[i])
+        out.release()
 
 
 def main():

@@ -52,11 +52,11 @@ python3 submit_results.py configs/train_tdt4265.yaml
 Remember to refresh file explorer if working on VS Code server with SSH - remote extension
 
 #### :movie_camera: Video Maker
-Download videoes from Google Drive, put in `datasets/videoes/`.
+Download videoes from Google Drive, and put them in `datasets/videos/`.
 
+Run
 ```bash
 mkdir outputs/videos // Not tested
-snap install ffmpeg
 python3 demo_video.py configs/train_tdt4265.yaml datasets/videos/2019-12-05_18-26-20-front_split2.mp4 outputs/videos/output1.mp4
 python3 demo_video.py configs/train_tdt4265.yaml datasets/videos/2019-12-06_09-44-38-front_split1.mp4 outputs/videos/output2.mp4
 ```
