@@ -9,6 +9,10 @@ import tqdm
 zip_url = ""
 dataset_path = pathlib.Path("datasets", "tdt4265")
 
+## To skip authentication
+# group_number=150
+# password="jK4C8G7LKbBJKdP5yoH5RShjoC"
+
 
 class RequestWrapper:
 
@@ -17,15 +21,17 @@ class RequestWrapper:
         self.get_token()
 
     def get_token(self):
-        group_number = input("group number:")
-        try:
-            group_number = int(group_number.strip())
-        except Exception:
-            print("Not a number. Write in your group number.")
-            exit()
+        # group_number = input("group number:")
+        group_number=150
+        # try:
+        #     group_number = int(group_number.strip())
+        # except Exception:
+        #     print("Not a number. Write in your group number.")
+        #     exit()
         user = f"group{group_number}"
         self.user = user
-        password = input("Type in password (Given in the assignment PDF):")
+        # password = input("Type in password (Given in the assignment PDF):")
+        password="jK4C8G7LKbBJKdP5yoH5RShjoC"
         data = {"username": user, "password": password.strip(), "email": ""}
         r = requests.post(f"{self.server_url}/api/v1/auth/login", data=data)
         if r.status_code != 200:
