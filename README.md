@@ -51,7 +51,17 @@ python3 submit_results.py configs/train_tdt4265.yaml
 
 Remember to refresh file explorer if working on VS Code server with SSH - remote extension
 
-### Using the Anaconda 'TermProject' Environment
+#### :movie_camera: Video Maker
+Download videoes from Google Drive, put in `datasets/videoes/`.
+
+```bash
+mkdir outputs/videos // Not tested
+snap install ffmpeg
+python3 demo_video.py configs/train_tdt4265.yaml datasets/videos/2019-12-05_18-26-20-front_split2.mp4 outputs/videos/output1.mp4
+python3 demo_video.py configs/train_tdt4265.yaml datasets/videos/2019-12-06_09-44-38-front_split1.mp4 outputs/videos/output2.mp4
+```
+
+### :snake: Using the Anaconda 'TermProject' Environment
 
 Follow the above instructions to after cloning the github repository. Make your way to the ```anaconda_setup``` and run ```install_anaconda_env.sh``` *AS SPECFIED*. This script will create a user install of anaconda at ```/work/<user-name>/anaconda```. The script also updates both the *waymo* and the *tdt4265* datasets. If you have named your 'mk_work_dir' something other than your username, the name can be passed as an argument into the bash script.
 
