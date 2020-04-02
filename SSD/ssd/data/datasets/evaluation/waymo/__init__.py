@@ -1,6 +1,6 @@
 import logging
 import os
-from ..voc.eval_detection_voc import eval_detection_voc
+from .eval_detection_tdt4265 import eval_detection_tdt4265
 from datetime import datetime
 
 
@@ -27,7 +27,7 @@ def waymo_evaluation(dataset, predictions, output_dir, iteration=None):
         pred_boxes_list.append(boxes)
         pred_labels_list.append(labels)
         pred_scores_list.append(scores)
-    result = eval_detection_voc(pred_bboxes=pred_boxes_list,
+    result = eval_detection_tdt4265(pred_bboxes=pred_boxes_list,
                                 pred_labels=pred_labels_list,
                                 pred_scores=pred_scores_list,
                                 gt_bboxes=gt_boxes_list,

@@ -1,16 +1,10 @@
 from torch.utils.data import ConcatDataset
 
 from ssd.config.path_catlog import DatasetCatalog
-from .voc import VOCDataset
-from .coco import COCODataset
-from .mnist import MNISTDetection
 from .waymo import WaymoDataset
 from .tdt4265 import TDT4265Dataset
 
 _DATASETS = {
-    'VOCDataset': VOCDataset,
-    'COCODataset': COCODataset,
-    'MNISTDetection': MNISTDetection,
     'WaymoDataset': WaymoDataset,
     'TDT4265Dataset': TDT4265Dataset
 }
@@ -25,10 +19,6 @@ def build_dataset(base_path: str, dataset_list, transform=None, target_transform
         factory = _DATASETS[data['factory']]
         args['transform'] = transform
         args['target_transform'] = target_transform
-        if factory == VOCDataset:
-            args['keep_difficult'] = not is_train
-        elif factory == COCODataset:
-            args['remove_empty'] = is_train
         dataset = factory(**args)
         datasets.append(dataset)
     # for testing, return a list of datasets
