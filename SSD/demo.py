@@ -4,7 +4,7 @@ import tqdm
 from PIL import Image
 from vizer.draw import draw_boxes
 from ssd.config.defaults import cfg
-from ssd.data.datasets import COCODataset, VOCDataset, MNISTDetection, TDT4265Dataset, WaymoDataset
+from ssd.data.datasets importTDT4265Dataset, WaymoDataset
 import argparse
 import numpy as np
 from ssd import torch_utils
@@ -15,13 +15,7 @@ from ssd.utils.checkpoint import CheckPointer
 
 @torch.no_grad()
 def run_demo(cfg, ckpt, score_threshold, images_dir: pathlib.Path, output_dir: pathlib.Path, dataset_type):
-    if dataset_type == "voc":
-        class_names = VOCDataset.class_names
-    elif dataset_type == 'coco':
-        class_names = COCODataset.class_names
-    elif dataset_type == "mnist":
-        class_names = MNISTDetection.class_names
-    elif dataset_type == "tdt4265":
+    if dataset_type == "tdt4265":
         class_names = TDT4265Dataset.class_names
     elif dataset_type == "waymo":
         class_names = WaymoDataset.class_names

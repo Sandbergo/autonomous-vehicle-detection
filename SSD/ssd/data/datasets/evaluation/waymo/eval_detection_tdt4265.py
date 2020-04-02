@@ -40,7 +40,7 @@ def bbox_iou(bbox_a, bbox_b):
     return area_i / (area_a[:, None] + area_b - area_i)
 
 
-def eval_detection_voc(
+def eval_detection_tdt4265(
         pred_bboxes,
         pred_labels,
         pred_scores,
@@ -49,12 +49,10 @@ def eval_detection_voc(
         gt_difficults=None,
         iou_thresh=0.5,
         use_07_metric=False):
-    """Calculate average precisions based on evaluation code of PASCAL VOC.
-
+    """Calculate average precisions based on evaluation code of PASCAL tdt4265.
     This function evaluates predicted bounding boxes obtained from a dataset
     which has :math:`N` images by using average precision for each class.
-    The code is based on the evaluation code used in PASCAL VOC Challenge.
-
+    The code is based on the evaluation code used in PASCAL tdt4265 Challenge.
     Args:
         pred_bboxes (iterable of numpy.ndarray): An iterable of :math:`N`
             sets of bounding boxes.
@@ -88,26 +86,22 @@ def eval_detection_voc(
             considers all bounding boxes to be not difficult.
         iou_thresh (float): A prediction is correct if its Intersection over
             Union with the ground truth is above this value.
-        use_07_metric (bool): Whether to use PASCAL VOC 2007 evaluation metric
+        use_07_metric (bool): Whether to use PASCAL tdt4265 2007 evaluation metric
             for calculating average precision. The default value is
             :obj:`False`.
-
     Returns:
         dict:
-
         The keys, value-types and the description of the values are listed
         below.
-
         * **ap** (*numpy.ndarray*): An array of average precisions. \
             The :math:`l`-th value corresponds to the average precision \
             for class :math:`l`. If class :math:`l` does not exist in \
             either :obj:`pred_labels` or :obj:`gt_labels`, the corresponding \
             value is set to :obj:`numpy.nan`.
         * **map** (*float*): The average of Average Precisions over classes.
-
     """
 
-    prec, rec = calc_detection_voc_prec_rec(pred_bboxes,
+    prec, rec = calc_detection_tdt4265_prec_rec(pred_bboxes,
                                             pred_labels,
                                             pred_scores,
                                             gt_bboxes,
@@ -115,22 +109,20 @@ def eval_detection_voc(
                                             gt_difficults,
                                             iou_thresh=iou_thresh)
 
-    ap = calc_detection_voc_ap(prec, rec, use_07_metric=use_07_metric)
+    ap = calc_detection_tdt4265_ap(prec, rec, use_07_metric=use_07_metric)
 
     return {'ap': ap, 'map': np.nanmean(ap)}
 
 
-def calc_detection_voc_prec_rec(
+def calc_detection_tdt4265_prec_rec(
         pred_bboxes, pred_labels, pred_scores, gt_bboxes, gt_labels,
         gt_difficults=None,
         iou_thresh=0.5):
-    """Calculate precision and recall based on evaluation code of PASCAL VOC.
-
+    """Calculate precision and recall based on evaluation code of PASCAL tdt4265.
     This function calculates precision and recall of
     predicted bounding boxes obtained from a dataset which has :math:`N`
     images.
-    The code is based on the evaluation code used in PASCAL VOC Challenge.
-
+    The code is based on the evaluation code used in PASCAL tdt4265 Challenge.
     Args:
         pred_bboxes (iterable of numpy.ndarray): An iterable of :math:`N`
             sets of bounding boxes.
@@ -164,11 +156,9 @@ def calc_detection_voc_prec_rec(
             considers all bounding boxes to be not difficult.
         iou_thresh (float): A prediction is correct if its Intersection over
             Union with the ground truth is above this value..
-
     Returns:
         tuple of two lists:
         This function returns two lists: :obj:`prec` and :obj:`rec`.
-
         * :obj:`prec`: A list of arrays. :obj:`prec[l]` is precision \
             for class :math:`l`. If class :math:`l` does not exist in \
             either :obj:`pred_labels` or :obj:`gt_labels`, :obj:`prec[l]` is \
@@ -178,7 +168,6 @@ def calc_detection_voc_prec_rec(
             difficult does not exist in \
             :obj:`gt_labels`, :obj:`rec[l]` is \
             set to :obj:`None`.
-
     """
 
     pred_bboxes = iter(pred_bboxes)
@@ -225,7 +214,7 @@ def calc_detection_voc_prec_rec(
                 match[l].extend((0,) * pred_bbox_l.shape[0])
                 continue
 
-            # VOC evaluation follows integer typed bounding boxes.
+            # tdt4265 evaluation follows integer typed bounding boxes.
             pred_bbox_l = pred_bbox_l.copy()
             pred_bbox_l[:, 2:] += 1
             gt_bbox_l = gt_bbox_l.copy()
@@ -281,13 +270,11 @@ def calc_detection_voc_prec_rec(
     return prec, rec
 
 
-def calc_detection_voc_ap(prec, rec, use_07_metric=False):
-    """Calculate average precisions based on evaluation code of PASCAL VOC.
-
+def calc_detection_tdt4265_ap(prec, rec, use_07_metric=False):
+    """Calculate average precisions based on evaluation code of PASCAL tdt4265.
     This function calculates average precisions
     from given precisions and recalls.
-    The code is based on the evaluation code used in PASCAL VOC Challenge.
-
+    The code is based on the evaluation code used in PASCAL tdt4265 Challenge.
     Args:
         prec (list of numpy.array): A list of arrays.
             :obj:`prec[l]` indicates precision for class :math:`l`.
@@ -297,17 +284,15 @@ def calc_detection_voc_ap(prec, rec, use_07_metric=False):
             :obj:`rec[l]` indicates recall for class :math:`l`.
             If :obj:`rec[l]` is :obj:`None`, this function returns
             :obj:`numpy.nan` for class :math:`l`.
-        use_07_metric (bool): Whether to use PASCAL VOC 2007 evaluation metric
+        use_07_metric (bool): Whether to use PASCAL tdt4265 2007 evaluation metric
             for calculating average precision. The default value is
             :obj:`False`.
-
     Returns:
         ~numpy.ndarray:
         This function returns an array of average precisions.
         The :math:`l`-th value corresponds to the average precision
         for class :math:`l`. If :obj:`prec[l]` or :obj:`rec[l]` is
         :obj:`None`, the corresponding value is set to :obj:`numpy.nan`.
-
     """
 
     n_fg_class = len(prec)

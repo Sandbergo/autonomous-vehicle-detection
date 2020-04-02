@@ -135,3 +135,12 @@ SSD/datasets/
 # Outputs
 
 SSD/outputs/
+
+# Datatypes
+*.txt
+*.pth 
+events*
+*.json
+
+# Div drit 
+**/__pycache__/**
