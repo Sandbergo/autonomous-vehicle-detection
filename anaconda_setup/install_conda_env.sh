@@ -11,6 +11,9 @@
 # Usage
 # ./install_conda_env.sh [<directory-in-/work/..>]
 
+# Script will terminate if any commands fail
+set -e
+
 # Setting work_dir folder
 if [ -z "$1" ]; then
     user=$(whoami)
@@ -35,8 +38,8 @@ if [[ ! -d /work/$user/anaconda ]]; then
     #mkdir /work/$user/anaconda
     cd ~/Downloads
     echo "### --------------------- Installing Anaconda --------------------- ###"
-    chmod +x Anaconda3-2020.02-Linux-x86_64.sh
-    ./Anaconda3-2020.02-Linux-x86_64.sh -b -p /work/$user/anaconda
+    # chmod +x Anaconda3-2020.02-Linux-x86_64.sh
+    bash Anaconda3-2020.02-Linux-x86_64.sh -b -p /work/$user/anaconda
     source /work/$user/anaconda/etc/profile.d/conda.sh
     # eval "$(/work/$user/anaconda/bin/conda shell.bash hook)"
 
