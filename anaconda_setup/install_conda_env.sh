@@ -35,14 +35,15 @@ if [[ ! -d /work/$user/anaconda ]]; then
     #mkdir /work/$user/anaconda
     cd ~/Downloads
     echo "### --------------------- Installing Anaconda --------------------- ###"
-    bash Anaconda3-2020.02-Linux-x86_64.sh -b -p /work/$user/anaconda
-    source /work/olavlp/anaconda/etc/profile.d/conda.sh
+    chmod +x Anaconda3-2020.02-Linux-x86_64.sh
+    ./Anaconda3-2020.02-Linux-x86_64.sh -b -p /work/$user/anaconda
+    source /work/$user/anaconda/etc/profile.d/conda.sh
     # eval "$(/work/$user/anaconda/bin/conda shell.bash hook)"
 
     # This adds conda path to your shells "--rc" file.
     conda init
 else
-    echo "The directory /work/olavlp/anaconda/ already exists, not installing anaconda"
+    echo "The directory /work/$user/anaconda/ already exists, not installing anaconda"
 fi
 
 # Create a symbolic link from github repo .yaml file so that any changes to the yaml file can update environment
