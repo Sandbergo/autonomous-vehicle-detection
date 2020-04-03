@@ -50,6 +50,16 @@ cfg.INPUT = CN()
 cfg.INPUT.IMAGE_SIZE = 300
 # Values to be used for image normalization, RGB layout
 cfg.INPUT.PIXEL_MEAN = [123, 117, 104]
+cfg.INPUT.PIXEL_STD  = [0.229*255, 0.224*255, 0.225*255]
+
+cfg.INPUT.PIXEL_MEAN = [102.84024296, 105.62803864, 107.21601897] # sampled
+cfg.INPUT.PIXEL_STD = [34.00486381, 47.00279835, 45.04625338] # sampled
+
+#cfg.INPUT.PIXEL_MEAN =  [35, 35, 35] # experimental
+cfg.INPUT.PIXEL_MEAN =  [98, 88, 87] # experimental
+cfg.INPUT.PIXEL_STD =  [27, 28, 24] # experimental
+cfg.INPUT.PIXEL_STD =  [1, 1, 1] # experimental
+
 
 # -----------------------------------------------------------------------------
 # Dataset

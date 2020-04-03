@@ -40,6 +40,7 @@ def make_data_loader(cfg, is_train=True, max_iter=None, start_iter=0):
     data_loaders = []
 
     for dataset in datasets:
+            
         if shuffle:
             sampler = torch.utils.data.RandomSampler(dataset)
         else:
