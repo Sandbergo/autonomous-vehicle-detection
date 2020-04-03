@@ -1,5 +1,5 @@
 from torch.utils.data import ConcatDataset
-
+import numpy as np
 from ssd.config.path_catlog import DatasetCatalog
 from .waymo import WaymoDataset
 from .tdt4265 import TDT4265Dataset
@@ -27,8 +27,9 @@ def build_dataset(base_path: str, dataset_list, transform=None, target_transform
     dataset = datasets[0]
     if len(datasets) > 1:
         dataset = ConcatDataset(datasets)
-    get_data_stats(dataset)
+    #get_data_stats(dataset)
     return [dataset]
+
 
 def get_data_stats(dataset):
     images = [np.array(image[0].reshape((image[0].shape[0], -1))).T for image in dataset]
