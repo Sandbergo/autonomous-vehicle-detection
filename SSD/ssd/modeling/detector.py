@@ -41,3 +41,12 @@ def build_backbone(cfg):
                 "https://s3.amazonaws.com/amdegroot-models/vgg16_reducedfc.pth")
             model.init_from_pretrain(state_dict)
         return model
+    if backbone_name == 'resnet_50':
+        if cfg.MODEL.BACKBONE.PRETRAINED:
+            state_dict = load_state_dict_from_url(
+                'https://download.pytorch.org/models/resnet50-19c8e357.pth')
+        else:
+            raise AssertionError(
+                f'MODEL.BACKBONE.PRETRAINED is set to {cfg.MODEL.BACKBONE.PRETRAINED}, should be True.'
+            )
+        return model
