@@ -31,4 +31,6 @@ class ResNetFeatureExtractor(nn.Module):
             if i % 8 == 0:
                 features.append(x)
 
+                print(self.features[i].shape[1:])
+
         return tuple(features)

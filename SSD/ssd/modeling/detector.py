@@ -44,8 +44,8 @@ def build_backbone(cfg):
         return model
     if backbone_name == 'resnet_50':
         if cfg.MODEL.BACKBONE.PRETRAINED:
-            state_dict = load_state_dict_from_url(
-                'https://download.pytorch.org/models/resnet50-19c8e357.pth')
+            # state_dict = load_state_dict_from_url(
+            #     'https://download.pytorch.org/models/resnet50-19c8e357.pth')
             model = ResNetFeatureExtractor(cfg)
         else:
             raise AssertionError(
