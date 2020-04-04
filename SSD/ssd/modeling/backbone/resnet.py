@@ -19,7 +19,7 @@ class ResNetFeatureExtractor(nn.Module):
         resnet_model.fc = nn.Linear(num_features, num_classes)
 
         # self.features = nn.Sequential(*list(resnet_model.children())[:-2])
-        self.features = nn.ModuleList(*list(resnet_model.children())[:-2])
+        self.features = nn.ModuleList(list(resnet_model.children())[:-2])
 
     def forward(self, x):
         # x = self.features(x)
