@@ -1,11 +1,20 @@
 MODEL:
     NUM_CLASSES: 5
     BACKBONE:
-        NAME: 'basic'
-        PRETRAINED: True # False
-        #OUT_CHANNELS: [128, 256, 128, 128, 64, 64]
-        OUT_CHANNELS: [256, 256, 512, 256, 256, 128, 128]
+        NAME: 'basicres'
+        PRETRAINED: False
+        OUT_CHANNELS: [256, 256, 512, 256, 256, 128]
+    #    OUT_CHANNELS: [256, 256, 256, 256, 256, 256]
         INPUT_CHANNELS: 3
+    #PRIORS:
+    #    FEATURE_MAPS: [75, 38, 19, 10, 5, 3, 1]
+    #    STRIDES: [4, 8, 16, 32, 64, 100, 300]
+    #    MIN_SIZES: [15, 30, 60, 111, 162, 213, 264]
+    #    MAX_SIZES: [30, 60, 111, 162, 213, 264, 315]
+    #    ASPECT_RATIOS: [[2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2], [2]]
+        # When has 1 aspect ratio, every location has 4 boxes, 2 ratio 6 boxes.
+        # #boxes = 2 + #ratio * 2
+    #    BOXES_PER_LOCATION: [6, 6, 6, 6, 6, 4, 4]  # number of boxes per feature map location
 INPUT:
     IMAGE_SIZE: 300
 DATASETS:
