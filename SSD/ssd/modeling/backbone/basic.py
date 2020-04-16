@@ -21,8 +21,54 @@ class BasicModel(torch.nn.Module):
         image_channels = cfg.MODEL.BACKBONE.INPUT_CHANNELS
         self.output_feature_size = cfg.MODEL.PRIORS.FEATURE_MAPS
 
-        kernel_size= 3
+        kernel_size = 3
+        if image_size[0] == image_size[1]:
+            small_kernel = 2
+        else:
+            small_kernel = (2,3)
 
+        # improved model
+        def feature_ext_block(input_channels:int, output_channels:int, first = False, final = False):
+            f_ext = torch.nn.Sequential(
+                torch.nn.LeakyReLU(),
+                torch.nn.BatchNorm2d(input_channels),
+                torch.nn.Conv2d(
+                    in_channels=input_channels,
+                    out_channels=input_channels,
+                    kernel_size=small_kernel if final else kernel_size,
+                    stride=1,
+                    padding=kernel_size // 2,
+                ),
+                torch.nn.LeakyReLU(),
+                torch.nn.BatchNorm2d(input_channels),
+                torch.nn.Conv2d(
+                    in_channels=input_channels,
+                    out_channels=output_channels,
+                    kernel_size=kernel_size,
+                    stride=2,
+                    padding=0 if final else kernel_size // 2
+                ),
+                torch.nn.LeakyReLU(),
+                torch.nn.BatchNorm2d(output_channels),
+                torch.nn.Conv2d(
+                    in_channels=output_channels,
+                    out_channels=output_channels,
+                    kernel_size=kernel_size,
+                    stride=2 if first else 1,
+                    padding=kernel_size // 2,
+                ),
+            )
+            return f_ext
+        """
+        self.f0 = feature_ext_block(3, output_channels[0]//2, first = True)
+        self.f1 = feature_ext_block(output_channels[0]//2, output_channels[0])
+        self.f2 = feature_ext_block(output_channels[0], output_channels[1])
+        self.f3 = feature_ext_block(output_channels[1], output_channels[2])
+        self.f4 = feature_ext_block(output_channels[2], output_channels[3])
+        self.f5 = feature_ext_block(output_channels[3], output_channels[4])
+        self.f6 = feature_ext_block(output_channels[4], output_channels[5], final = True)
+        """
+        
         # improved model
         self.f1 = torch.nn.Sequential(torch.nn.Conv2d(
                 in_channels=3,
@@ -217,6 +263,7 @@ class BasicModel(torch.nn.Module):
         )
 
     
+    
     def forward(self, x):
         """
         The forward functiom should output features with shape:
@@ -230,15 +277,17 @@ class BasicModel(torch.nn.Module):
         where out_features[0] should have the shape:
             shape(-1, output_channels[0], 38, 38),
         """
-       
-        feature_map_size_list = [torch.Size([256, 38, 38]),
-                                 torch.Size([512, 19, 19]),
-                                 torch.Size([256, 10, 10]),
-                                 torch.Size([256, 5, 5]),
-                                 torch.Size([128, 3, 3]),
-                                 torch.Size([128, 1, 1])]
+        out_ch = self.output_channels
+        out_feat = self.output_feature_size
+        feature_map_size_list = [
+                torch.Size([out_ch[0], out_feat[0][0], out_feat[0][1]]),
+                torch.Size([out_ch[1], out_feat[1][0], out_feat[1][1]]),
+                torch.Size([out_ch[2], out_feat[2][0], out_feat[2][1]]),
+                torch.Size([out_ch[3], out_feat[3][0], out_feat[3][1]]),
+                torch.Size([out_ch[4], out_feat[4][0], out_feat[4][1]]),
+                torch.Size([out_ch[5], out_feat[5][0], out_feat[5][1]])]
 
-        x1 = self.f1(x)
+        x1 = self.f1(self.f0(x))
         x2 = self.f2(x1)
         x3 = self.f3(x2)
         x4 = self.f4(x3)
