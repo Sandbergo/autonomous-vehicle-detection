@@ -45,13 +45,13 @@ class ExtraLayers(nn.Module):
     
     def __init__(self, inplanes):
         super(ExtraLayers, self).__init__()
-        self.convbnrelu1_1 = ConvBnReluLayer(256, 256, kernel_size=1, padding=0, stride=1)
-        self.convbnrelu1_2 = ConvBnReluLayer(256, 256, kernel_size=3, padding=1, stride=2)
-        self.convbnrelu2_1 = ConvBnReluLayer(256, 256, kernel_size=1, padding=0, stride=1)
-        self.convbnrelu2_2 = ConvBnReluLayer(256, 256, kernel_size=3, padding=1, stride=2) 
-        self.convbnrelu3_1 = ConvBnReluLayer(256, 256, kernel_size=1, padding=1, stride=1)
-        self.convbnrelu3_2 = ConvBnReluLayer(256, 256, kernel_size=3, padding=0, stride=2) # padding = 1
-        self.avgpool = nn.AvgPool2d(kernel_size=3, stride=1) # 3
+        self.convbnrelu1_1 = ConvBnReluLayer(inplanes, 256, kernel_size=1, padding=0, stride=1)
+        self.convbnrelu1_2 = ConvBnReluLayer(256, 512, kernel_size=3, padding=1, stride=2)
+        self.convbnrelu2_1 = ConvBnReluLayer(512, 256, kernel_size=1, padding=0, stride=1)
+        self.convbnrelu2_2 = ConvBnReluLayer(256, 512, kernel_size=3, padding=1, stride=2) 
+        self.convbnrelu3_1 = ConvBnReluLayer(512, 256, kernel_size=1, padding=0, stride=1)
+        self.convbnrelu3_2 = ConvBnReluLayer(256, 512, kernel_size=3, padding=1, stride=2)
+        self.avgpool = nn.AvgPool2d(3, stride=1)
         
     def forward(self, x):
         out1_1 = self.convbnrelu1_1(x)
@@ -60,7 +60,7 @@ class ExtraLayers(nn.Module):
         out2_2 = self.convbnrelu2_2(out2_1)
         out3_1 = self.convbnrelu3_1(out2_2)
         out3_2 = self.convbnrelu3_2(out3_1)
-        out = self.avgpool(out3_2)
+        out = self.avgpool(out)
         return out1_2, out2_2, out3_2, out
     
 
@@ -95,6 +95,7 @@ class BasicBlock(nn.Module):
 
         if self.downsample is not None:
             residual = self.downsample(x)
+
         out += residual
         out = self.relu(out)
 
@@ -144,22 +145,22 @@ class ResNetBase(nn.Module):
 
     def __init__(self, block, layers, width=1, num_classes=1000):
         self.inplanes = 64
-        widths = [int(round(ch * width)) for ch in [256, 256, 256, 256]]
-        #widths = [int(round(ch * width)) for ch in [64, 256, 512]]
+        widths = [int(round(ch * width)) for ch in [64, 128, 256, 512]]
         super(ResNetBase, self).__init__()
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, widths[0], layers[0], stride=1) # stride = 1
+        self.layer1 = self._make_layer(block, widths[0], layers[0])
         self.layer2 = self._make_layer(block, widths[1], layers[1], stride=2)
-        self.layer3 = self._make_layer(block, widths[2], layers[2], stride=2) # widths[2]
+        self.layer3 = self._make_layer(block, widths[2], layers[2], stride=2)
         # change stride = 2, dilation = 1 in ResNet to stride = 1, dilation = 2 for the final _make_layer
-        self.layer4 = self._make_layer(block, widths[3], layers[3], stride=2, dilation=1) # commented
+        self.layer4 = self._make_layer(block, widths[3], layers[3], stride=1, dilation=2)
+        # self.layer4 = self._make_layer(block, widths[3], layers[3], stride=2, dilation=1)
         # remove the final avgpool and fc layers
         # self.avgpool = nn.AvgPool2d(7, stride=1)
-        # self.fc = nn.Linear(widths[3] * block.expansion, num_classes)
+        self.fc = nn.Linear(widths[3] * block.expansion, num_classes)
         # add extra layers
         self.extra_layers = ExtraLayers(self.inplanes)
         
@@ -198,13 +199,15 @@ class ResNetBase(nn.Module):
         x = self.layer2(x)
         out38x38 = x
         x = self.layer3(x)
-        #x = self.layer4(x)
+        x = self.layer4(x)
         out19x19 = x
+        print('skrrt')
 
         out10x10, out5x5, out3x3, out1x1 = self.extra_layers(x)
         # x = self.avgpool(x)
         # x = x.view(x.size(0), -1)
         # x = self.fc(x)
+
         return out38x38, out19x19, out10x10, out5x5, out3x3, out1x1
 
            
@@ -215,8 +218,6 @@ def resnet_base(depth, width=1, pretrained=False, **kwargs):
         width (float): widen factor for intermediate layers of resnet
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    # testing
-    depth = 34
     if (depth not in [18, 34, 50, 101, 152]):
         raise ValueError('Choose 18, 34, 50, 101 or 152 for depth')  
     if ((width != 1) and pretrained):

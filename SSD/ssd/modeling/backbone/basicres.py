@@ -21,7 +21,7 @@ class BasicResnetModel(torch.nn.Module):
         image_channels = cfg.MODEL.BACKBONE.INPUT_CHANNELS
         self.output_feature_size = cfg.MODEL.PRIORS.FEATURE_MAPS
 
-        kernel_size= 3
+        kernel_size = 3
 
         # improved model
         self.f1 = torch.nn.Sequential(torch.nn.Conv2d(
@@ -224,34 +224,18 @@ class BasicResnetModel(torch.nn.Module):
                 torch.nn.Conv2d(output_channels[3], output_channels[4],
                           kernel_size=1, stride = 2, padding = 0,   bias=False),
                 torch.nn.BatchNorm2d(output_channels[4]))
-                
+        
+        #kernel_size=(3,2)
         self.f6 = torch.nn.Sequential(
             torch.nn.LeakyReLU(),
             torch.nn.BatchNorm2d(output_channels[4]),
             torch.nn.Conv2d(
                 in_channels=output_channels[4],
-                out_channels=256,
-                kernel_size=kernel_size,
-                stride=1,
-                padding=kernel_size // 2
-            ),
-            torch.nn.LeakyReLU(),
-            torch.nn.Conv2d(
-                in_channels=256,
                 out_channels=output_channels[5],
                 kernel_size=kernel_size,
-                stride=2,
+                stride=1,
                 padding=0
-            ),
-            torch.nn.LeakyReLU(),
-            torch.nn.BatchNorm2d(output_channels[5]),
-            torch.nn.Conv2d(
-                in_channels=output_channels[5],
-                out_channels=output_channels[5],
-                kernel_size=kernel_size,
-                stride=1,
-                padding=kernel_size // 2
-            ),
+            )
         )
 
         self.d6 = torch.nn.Sequential(
@@ -276,26 +260,27 @@ class BasicResnetModel(torch.nn.Module):
         """
        
         feature_map_size_list = [
-                                 torch.Size([self.output_channels[0], 38, 38]),
-                                 torch.Size([self.output_channels[1], 19, 19]),
-                                 torch.Size([self.output_channels[2], 10, 10]),
-                                 torch.Size([self.output_channels[3], 5, 5]),
-                                 torch.Size([self.output_channels[4], 3, 3]),
-                                 torch.Size([self.output_channels[5], 1, 1])]
+                                 torch.Size([self.output_channels[0], self.output_feature_size[0][0], self.output_feature_size[0][1]]),
+                                 torch.Size([self.output_channels[1], self.output_feature_size[1][0], self.output_feature_size[1][1]]),
+                                 torch.Size([self.output_channels[2], self.output_feature_size[2][0], self.output_feature_size[2][1]]),
+                                 torch.Size([self.output_channels[3], self.output_feature_size[3][0], self.output_feature_size[3][1]]),
+                                 torch.Size([self.output_channels[4], self.output_feature_size[4][0], self.output_feature_size[4][1]]),
+                                 torch.Size([self.output_channels[5], self.output_feature_size[5][0], self.output_feature_size[5][1]])]
 
-        x1 = self.f1(x) + self.d1(x)
-        x2 = self.f2(x1) + self.d2(x1)
-        x3 = self.f3(x2) + self.d3(x2)
-        x4 = self.f4(x3) + self.d4(x3)
-        x5 = self.f5(x4) + self.d5(x4)
-        x6 = self.f6(x5) + self.d6(x5)
+        x1 = self.f1(x) #+ self.d1(x)
+        x2 = self.f2(x1) #+ self.d2(x1)
+        x3 = self.f3(x2) #+ self.d3(x2)
+        x4 = self.f4(x3) #+ self.d4(x3)
+        x5 = self.f5(x4) #+ self.d5(x4)
+        x6 = self.f6(x5) #+ self.d6(x5)
         
         out_features = [x1, x2, x3, x4, x5, x6]
 
         for idx, feature in enumerate(out_features):
             out_channel = self.output_channels[idx]
             expected_shape = feature_map_size_list[idx]
+            print(f"got: {feature.shape[1:]} at output IDX: {idx}")
             assert feature.shape[1:] == expected_shape, \
                 f"Expected shape: {expected_shape}, got: {feature.shape[1:]} at output IDX: {idx}"
-        
+        print('checked')
         return tuple(out_features)

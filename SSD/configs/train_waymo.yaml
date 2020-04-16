@@ -1,9 +1,10 @@
 MODEL:
     NUM_CLASSES: 5
     BACKBONE:
-        NAME: 'basicres'
-        PRETRAINED: False
+        NAME: 'resnet'
+        PRETRAINED: True
         OUT_CHANNELS: [256, 256, 512, 256, 256, 128]
+        OUT_CHANNELS: [128, 256, 512, 512, 512, 512]
         INPUT_CHANNELS: 3
     #PRIORS:
     #    FEATURE_MAPS: [ 38, 19, 10, 5, 3, 1]

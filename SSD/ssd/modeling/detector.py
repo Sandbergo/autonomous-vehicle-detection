@@ -44,7 +44,7 @@ def build_backbone(cfg):
             model.init_from_pretrain(state_dict)
         return model
     if backbone_name == "resnet":
-        model = resnet_base(cfg)
+        model = resnet_base(depth = 101, width=1, pretrained=True)
         return model
     if backbone_name == "basicres":
         model = BasicResnetModel(cfg)
