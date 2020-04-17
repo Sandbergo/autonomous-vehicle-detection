@@ -1,6 +1,7 @@
 from torch import nn
 from ssd.modeling.backbone.vgg import VGG
 from ssd.modeling.backbone.basic import BasicModel
+from ssd.modeling.backbone.inception import InceptionFeatureExtractor
 from ssd.modeling.box_head.box_head import SSDBoxHead
 from ssd.utils.model_zoo import load_state_dict_from_url
 from ssd import torch_utils
@@ -9,6 +10,7 @@ class SSDDetector(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         self.cfg = cfg
+        # print('Building backbone.')
         self.backbone = build_backbone(cfg)
         self.box_head = SSDBoxHead(cfg)
         print(
@@ -40,4 +42,14 @@ def build_backbone(cfg):
             state_dict = load_state_dict_from_url(
                 "https://s3.amazonaws.com/amdegroot-models/vgg16_reducedfc.pth")
             model.init_from_pretrain(state_dict)
+        return model
+    if backbone_name == "inception":
+        # if cfg.MODEL.BACKBONE.PRETRAINED:
+            # print('Loading state dict.')
+            # state_dict = load_state_dict_from_url(
+            #     "https://download.pytorch.org/models/inception_v3_google-1a9a5a14.pth")
+            # model.init_from_pretrain(state_dict)
+            # model.load_state_dict(state_dict)
+            # print('Finished loading state dict.')
+        model = InceptionFeatureExtractor(cfg, is_pretrained=cfg.MODEL.BACKBONE.PRETRAINED)
         return model
