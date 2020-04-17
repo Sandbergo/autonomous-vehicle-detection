@@ -29,10 +29,9 @@ class PriorBox:
 
             #for i, j in product(range(f), repeat=2):
             for i, j in product(range(f_lst[0]), range(f_lst[1])):
-            
-                # unit center x,y
-                cx = (j + 0.5) / scale_x
-                cy = (i + 0.5) / scale_y
+
+                cx = (i + 0.5) / scale_x
+                cy = (j + 0.5) / scale_y 
 
                 # small sized square box
                 size = self.min_sizes[k]
