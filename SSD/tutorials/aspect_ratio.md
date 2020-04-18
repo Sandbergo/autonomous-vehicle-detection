@@ -1,6 +1,13 @@
 # :camera: How to change aspect ratio NOT WORKING YET
 1. Change in SSD/ssd/modelling/backbone/modelname.py forward-function:
 ```
+kernel_size = 3
+if image_size[0] == image_size[1]:
+      small_kernel = 2
+else:
+      small_kernel = (2,3)
+
+            
 out_ch = self.output_channels
 out_feat = self.output_feature_size
 feature_map_size_list = [
