@@ -47,7 +47,7 @@ cfg.MODEL.BOX_HEAD.PREDICTOR = 'SSDBoxPredictor'
 # -----------------------------------------------------------------------------
 cfg.INPUT = CN()
 # Image size
-cfg.INPUT.IMAGE_SIZE = 300
+cfg.INPUT.IMAGE_SIZE = [320, 240]
 # Values to be used for image normalization, RGB layout
 cfg.INPUT.PIXEL_MEAN = [123, 117, 104]
 
@@ -88,7 +88,7 @@ cfg.SOLVER.WARMUP_ITERS = 500
 # ---------------------------------------------------------------------------- #
 cfg.TEST = CN()
 cfg.TEST.NMS_THRESHOLD = 0.45
-cfg.TEST.CONFIDENCE_THRESHOLD = 0.01
+cfg.TEST.CONFIDENCE_THRESHOLD = 0.1#0.01
 cfg.TEST.MAX_PER_CLASS = -1
 cfg.TEST.MAX_PER_IMAGE = 100
 cfg.TEST.BATCH_SIZE = 10
@@ -97,7 +97,7 @@ cfg.TEST.BATCH_SIZE = 10
 # Specific test options
 # ---------------------------------------------------------------------------- #
 cfg.EVAL_STEP = 500 # Evaluate dataset every eval_step, disabled when eval_step < 0
-cfg.MODEL_SAVE_STEP = 500 # Save checkpoint every save_step
-cfg.LOG_STEP = 10 # Print logs every log_stepPrint logs every log_step
+cfg.MODEL_SAVE_STEP = 10000 # Save checkpoint every save_step
+cfg.LOG_STEP = 50 # Print logs every log_stepPrint logs every log_step
 cfg.OUTPUT_DIR = "outputs"
 cfg.DATASET_DIR = "datasets"

@@ -22,31 +22,37 @@ class PriorBox:
                     are relative to the image size.
         """
         priors = []
-        for k, f in enumerate(self.feature_maps):
-            scale = self.image_size / self.strides[k]
-            for i, j in product(range(f), repeat=2):
-                # unit center x,y
-                cx = (j + 0.5) / scale
-                cy = (i + 0.5) / scale
+        for k, f_lst in enumerate(self.feature_maps):
+            scale_x = self.image_size[0] / self.strides[k]
+            scale_y = self.image_size[1] / self.strides[k]
+            
+            #for i, j in product(range(f_lst[0]), repeat=2):
+            for i, j in product(range(f_lst[0]), range(f_lst[1])):
+
+                cx = (j + 0.5) / scale_x
+                cy = (i + 0.5) / scale_y 
 
                 # small sized square box
                 size = self.min_sizes[k]
-                h = w = size / self.image_size
+                w = size / self.image_size[0]
+                h = size / self.image_size[1]
                 priors.append([cx, cy, w, h])
 
                 # big sized square box
                 size = sqrt(self.min_sizes[k] * self.max_sizes[k])
-                h = w = size / self.image_size
+                w = size / self.image_size[0]
+                h = size / self.image_size[1]
                 priors.append([cx, cy, w, h])
 
                 # change h/w ratio of the small sized box
                 size = self.min_sizes[k]
-                h = w = size / self.image_size
+                w = size / self.image_size[0]
+                h = size / self.image_size[1]
                 for ratio in self.aspect_ratios[k]:
                     ratio = sqrt(ratio)
                     priors.append([cx, cy, w * ratio, h / ratio])
                     priors.append([cx, cy, w / ratio, h * ratio])
-
+        
         priors = torch.tensor(priors)
         if self.clip:
             priors.clamp_(max=1, min=0)
