@@ -2,23 +2,25 @@ MODEL:
     NUM_CLASSES: 5
     BACKBONE:
         NAME: 'inception'
-        PRETRAINED: True
-        OUT_CHANNELS: [256, 768, 768, 1280, 2048, 2048]
+        PRETRAINED: True # True
+        OUT_CHANNELS: [288, 768, 512, 256, 256, 256] # [288, 512, 512, 256, 256, 256] # [288, 256, 512, 512, 1024, 1024]
         INPUT_CHANNELS: 3
     PRIORS:
-        FEATURE_MAPS: [35, 17, 17, 8, 8, 1]
+        FEATURE_MAPS: [35, 17, 8, 8, 4, 1] # ORIG: --> [35, 17, 6, 6, 3, 1] # [35, 17, 12, 12, 6, 1]
 INPUT:
     IMAGE_SIZE: 299 # 300
 DATASETS:
     TRAIN: ("tdt4265_train",)
     TEST: ("tdt4265_val", )
 SOLVER:
-    MAX_ITER: 25000
+    MAX_ITER: 20000
     LR_STEPS: [80000, 100000]
     GAMMA: 0.1
-    BATCH_SIZE: 32
-    LR: 1e-3
-EVAL_STEP: 2000
-MODEL_SAVE_STEP: 2000
+    BATCH_SIZE: 16
+    LR: 1e-3 # 5e-4
+EVAL_STEP: 500
+MODEL_SAVE_STEP: 5000
 OUTPUT_DIR: 'outputs/inception'
 DATASET_DIR: "datasets"
+
+# 1, 2, 3, 4, 5, 6

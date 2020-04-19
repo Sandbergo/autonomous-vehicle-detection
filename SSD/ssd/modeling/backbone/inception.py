@@ -16,11 +16,22 @@ class InceptionFeatureExtractor(nn.Module):
         self.out_feature_sizes = cfg.MODEL.PRIORS.FEATURE_MAPS
         self.transform_input = transform_input
 
-        self.inception_model = models.inception_v3(pretrained=True, transform_input=transform_input)
+        self.inception_model = models.inception_v3(pretrained=is_pretrained, transform_input=transform_input)
 
-        # Freeze all layers in the inception_v3 model
-        for param in self.inception_model.parameters():
-            param.requires_grad = False
+        # Freeze all layers except last two in the inception_v3 model
+        layer_count = 0
+
+        for child in self.inception_model.children():
+            layer_count += 1
+
+            if layer_count < 7: 
+                for param in child.parameters():
+                    param.requires_grad = False
+
+        print('Layer count', layer_count)
+
+        # for param in self.inception_model.parameters(): ##############################
+        #     param.requires_grad = False                 ##############################
 
         # self.inception_features = nn.Sequential(*list(inception.children())[:-1])
 
@@ -57,9 +68,88 @@ class InceptionFeatureExtractor(nn.Module):
 
         """
 
+        kernel_size = 3
+
         self.extra_layer1 = nn.Sequential(
-            torch.nn.Conv2d(in_channels=INCEPTION_END_SIZE, )
+            torch.nn.Conv2d(
+                in_channels=2048, # self.out_channels[0],
+                out_channels=self.out_channels[2], # self.out_channels[1],
+                kernel_size=kernel_size,
+                stride=1,
+                padding=kernel_size // 2
+            ),
+            torch.nn.LeakyReLU(),
+            torch.nn.BatchNorm2d(self.out_channels[2]), #(self.out_channels[1]),
+            # torch.nn.MaxPool2d(kernel_size=2, stride=2),
+            #
+            torch.nn.Conv2d(
+                in_channels=self.out_channels[2], #self.out_channels[1],
+                out_channels=self.out_channels[2], #self.out_channels[1],
+                kernel_size=kernel_size,
+                stride=1,
+                padding=kernel_size // 2
+            ),
+            torch.nn.LeakyReLU(),
+            torch.nn.BatchNorm2d(self.out_channels[2]), #(self.out_channels[1]),
         )
+
+        self.extra_layer2 = nn.Sequential(
+            torch.nn.Conv2d(
+                in_channels=self.out_channels[2],
+                out_channels=self.out_channels[3],
+                kernel_size=kernel_size,
+                stride=1,
+                padding=kernel_size // 2
+            ),
+            torch.nn.LeakyReLU(),
+            torch.nn.BatchNorm2d(self.out_channels[3]),
+            # torch.nn.MaxPool2d(kernel_size=2, stride=1, dilation=5),
+            torch.nn.Conv2d(
+                in_channels=self.out_channels[3],
+                out_channels=self.out_channels[3],
+                kernel_size=kernel_size,
+                stride=1, # stride=2,
+                padding=kernel_size // 2
+            ),
+            torch.nn.LeakyReLU(),
+            torch.nn.BatchNorm2d(self.out_channels[3]),
+        )
+
+        self.extra_layer3 = nn.Sequential(
+            torch.nn.Conv2d(
+                in_channels=self.out_channels[3],
+                out_channels=self.out_channels[4],
+                kernel_size=kernel_size,
+                stride=1,
+                padding=kernel_size // 2
+            ),
+            torch.nn.LeakyReLU(),
+            torch.nn.BatchNorm2d(self.out_channels[4]),
+            # torch.nn.MaxPool2d(kernel_size=2, stride=2),
+            torch.nn.Conv2d(
+                in_channels=self.out_channels[4],
+                out_channels=self.out_channels[4],
+                kernel_size=kernel_size,
+                stride=2,
+                padding=kernel_size // 2
+            ),
+            torch.nn.LeakyReLU(),
+            torch.nn.BatchNorm2d(self.out_channels[4]),
+        )
+
+        self.extra_layer4 = nn.Sequential(
+            torch.nn.Conv2d(
+                in_channels=self.out_channels[3],
+                out_channels=self.out_channels[4],
+                kernel_size=kernel_size,
+                stride=2,
+                padding=kernel_size // 2
+            ),
+            torch.nn.LeakyReLU(),
+            torch.nn.BatchNorm2d(self.out_channels[4]),
+            # torch.nn.MaxPool2d(kernel_size=2, stride=2),
+        )
+
 
     def _transform_input(self, x):
         if self.transform_input:
@@ -114,11 +204,26 @@ class InceptionFeatureExtractor(nn.Module):
         x = self.inception_model.Conv2d_4a_3x3(x)
         x = F.max_pool2d(x, kernel_size=3, stride=2)
 
-        x1 = self.inception_model.Mixed_5b(x)
-        x = x1
+        x = self.inception_model.Mixed_5b(x)
+        # x = x1
 
         x = self.inception_model.Mixed_5c(x)
-        x = self.inception_model.Mixed_5d(x)
+        # x = x1
+
+        x1 = self.inception_model.Mixed_5d(x)
+        x = x1
+
+        x = self.inception_model.Mixed_6a(x)
+        x = self.inception_model.Mixed_6b(x)
+        x = self.inception_model.Mixed_6c(x)
+        x = self.inception_model.Mixed_6d(x)
+
+        x2 = self.inception_model.Mixed_6e(x)
+        x = x2
+
+        x = self.inception_model.Mixed_7a(x)
+        x = self.inception_model.Mixed_7b(x)
+        x = self.inception_model.Mixed_7c(x)
 
         """
 
@@ -144,10 +249,22 @@ class InceptionFeatureExtractor(nn.Module):
         """
 
         # return [x1, x2, x3, x4, x5], x
-        return x                                # N x 288 x 35 x 35
+        return x, [x1, x2]                                # N x 288 x 35 x 35
 
     def _extra_forward(self, x):
+        x = self.extra_layer1(x)
+        x2 = x  # 16 x 256 x 17 x 17 
+        
+        x = self.extra_layer2(x)
+        x3 = x  # 16 x 512 x 12 x 12 - alt # 16 x 512 x 6 x 6
 
+        x = self.extra_layer3(x)
+        x4 = x  # 16 x 512 x 12 x 12 - alt # 16 x 512 x 6 x 6
+
+        #x = self.extra_layer4(x)
+        #x5 = x  # 16 x 256 x 6 x 6   - alt # 16 x 256 x 3 x 3
+        
+        return [x2, x3, x4], x # [x2, x3, x4, x5], x
 
     def forward(self, x):
 
@@ -165,11 +282,15 @@ class InceptionFeatureExtractor(nn.Module):
 
         x = self._transform_input(x)
 
-        inception_features, x_ = self._forward(x)
+        # inception_features, x = self._forward(x)
+        x, inception_features = self._forward(x)
+        inception_feature = inception_features # x1  # N x 288 x 35 x 35 - alt # N x 768 x 17 x 17
 
-        x6 = F.adaptive_avg_pool2d(x_, (1,1))
+        extra_features, x = self._extra_forward(x)
 
-        out_features = inception_features + [x6]
+        final_feature = F.adaptive_max_pool2d(x, (1,1)) # x6 
+
+        out_features = inception_features + extra_features + [final_feature]
 
         for i, feature in enumerate(out_features):
             out_channel = self.out_channels[i]
