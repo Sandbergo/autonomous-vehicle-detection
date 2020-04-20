@@ -47,7 +47,7 @@ def build_backbone(cfg):
             model.init_from_pretrain(state_dict)
         return model
 """    
-
+# new method
 from torch import nn
 
 from ssd.modeling.backbone import build_backbone
