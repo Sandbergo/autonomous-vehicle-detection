@@ -15,7 +15,7 @@ class PriorBox:
         self.clip = prior_config.CLIP
 
     def __call__(self):
-        """Generate SSD Prior Boxes.
+        """ Generate SSD Prior Boxes.
             It returns the center, height and width of the priors. The values are relative to the image size
             Returns:
                 priors (num_priors, 4): The prior boxes represented as [[center_x, center_y, w, h]]. All the values
@@ -23,11 +23,10 @@ class PriorBox:
         """
         priors = []
         for k, f_lst in enumerate(self.feature_maps):
-            scale_x = self.image_size[0] / self.strides[k]
-            scale_y = self.image_size[1] / self.strides[k]
+            scale_x = self.image_size[0] / self.strides[k][0]
+            scale_y = self.image_size[1] / self.strides[k][1]
             
-            #for i, j in product(range(f_lst[0]), repeat=2):
-            for i, j in product(range(f_lst[0]), range(f_lst[1])):
+            for i, j in product(range(f_lst[1]), range(f_lst[0])):
 
                 cx = (j + 0.5) / scale_x
                 cy = (i + 0.5) / scale_y 

@@ -1,4 +1,5 @@
 import torch
+from ssd.modeling import registry
 
 
 class BasicModel(torch.nn.Module):
@@ -261,3 +262,9 @@ class BasicModel(torch.nn.Module):
                 f"Expected shape: {expected_shape}, got: {feature.shape[1:]} at output IDX: {idx}"
         
         return tuple(out_features)
+
+@registry.BACKBONES.register('basic')
+def basic(cfg, pretrained=True):
+    model = BasicModel(cfg)
+    
+    return model
