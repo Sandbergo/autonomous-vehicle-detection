@@ -50,8 +50,7 @@ cfg.INPUT = CN()
 cfg.INPUT.IMAGE_SIZE = [320, 240]
 # Values to be used for image normalization, RGB layout
 cfg.INPUT.PIXEL_MEAN = [123, 117, 104]
-cfg.INPUT.STD = [0.229*255, 0.224*255, 0.225*255]
-
+cfg.INPUT.PIXEL_STD = [0.229*255, 0.224*255, 0.225*255]
 # -----------------------------------------------------------------------------
 # Dataset
 # -----------------------------------------------------------------------------
@@ -99,6 +98,6 @@ cfg.TEST.BATCH_SIZE = 10
 # ---------------------------------------------------------------------------- #
 cfg.EVAL_STEP = 500 # Evaluate dataset every eval_step, disabled when eval_step < 0
 cfg.MODEL_SAVE_STEP = 5000 # Save checkpoint every save_step
-cfg.LOG_STEP = 50 # Print logs every log_stepPrint logs every log_step
+cfg.LOG_STEP = 100 # Print logs every log_stepPrint logs every log_step
 cfg.OUTPUT_DIR = "outputs"
 cfg.DATASET_DIR = "datasets"

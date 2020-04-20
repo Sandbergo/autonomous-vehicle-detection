@@ -24,8 +24,8 @@ INPUT:
     #IMAGE_SIZE: [300, 300]
     IMAGE_SIZE: [320, 240]
 DATASETS:
-    TRAIN: ("waymo_train",)
-    TEST: ("waymo_val", )
+    TRAIN: ("tdt4265_train",)
+    TEST: ("tdt4265_val", )
 SOLVER:
     MAX_ITER: 30_000
     LR_STEPS: [80000, 100000]

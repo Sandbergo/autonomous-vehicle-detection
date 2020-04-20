@@ -12,6 +12,8 @@ from ssd.solver.build import make_optimizer, make_lr_scheduler
 from ssd.utils.checkpoint import CheckPointer
 from ssd.utils.logger import setup_logger
 from ssd import torch_utils
+import warnings
+warnings.filterwarnings('ignore',category=FutureWarning)
 
 
 def start_train(cfg):
