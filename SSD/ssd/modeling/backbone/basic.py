@@ -1,4 +1,5 @@
 import torch
+from ssd.modeling import registry
 
 
 class BasicModel(torch.nn.Module):
@@ -21,7 +22,11 @@ class BasicModel(torch.nn.Module):
         image_channels = cfg.MODEL.BACKBONE.INPUT_CHANNELS
         self.output_feature_size = cfg.MODEL.PRIORS.FEATURE_MAPS
 
-        kernel_size= 3
+        kernel_size = 3
+        if image_size[0] == image_size[1]:
+            small_kernel = 3
+        else:
+            small_kernel = (2,3)
 
         # improved model
         self.f1 = torch.nn.Sequential(torch.nn.Conv2d(
@@ -201,19 +206,19 @@ class BasicModel(torch.nn.Module):
             torch.nn.Conv2d(
                 in_channels=256,
                 out_channels=output_channels[5],
-                kernel_size=kernel_size,
+                kernel_size=small_kernel,
                 stride=2,
                 padding=0
             ),
-            torch.nn.LeakyReLU(),
-            torch.nn.BatchNorm2d(output_channels[5]),
-            torch.nn.Conv2d(
-                in_channels=output_channels[5],
-                out_channels=output_channels[5],
-                kernel_size=kernel_size,
-                stride=1,
-                padding=kernel_size // 2
-            ),
+            #torch.nn.LeakyReLU(),
+            #torch.nn.BatchNorm2d(output_channels[5]),
+            #torch.nn.Conv2d(
+            #    in_channels=output_channels[5],
+            #    out_channels=output_channels[5],
+            #    kernel_size=kernel_size,
+            #    stride=1,
+            #    padding=kernel_size // 2
+            #),
         )
 
     
@@ -231,13 +236,16 @@ class BasicModel(torch.nn.Module):
             shape(-1, output_channels[0], 38, 38),
         """
        
-        feature_map_size_list = [torch.Size([256, 38, 38]),
-                                 torch.Size([512, 19, 19]),
-                                 torch.Size([256, 10, 10]),
-                                 torch.Size([256, 5, 5]),
-                                 torch.Size([128, 3, 3]),
-                                 torch.Size([128, 1, 1])]
-
+        out_ch = self.output_channels
+        out_feat = self.output_feature_size
+        feature_map_size_list = [
+            torch.Size([out_ch[0], out_feat[0][1], out_feat[0][0]]),
+            torch.Size([out_ch[1], out_feat[1][1], out_feat[1][0]]),
+            torch.Size([out_ch[2], out_feat[2][1], out_feat[2][0]]),
+            torch.Size([out_ch[3], out_feat[3][1], out_feat[3][0]]),
+            torch.Size([out_ch[4], out_feat[4][1], out_feat[4][0]]),
+            torch.Size([out_ch[5], out_feat[5][1], out_feat[5][0]])]
+        
         x1 = self.f1(x)
         x2 = self.f2(x1)
         x3 = self.f3(x2)
@@ -254,3 +262,9 @@ class BasicModel(torch.nn.Module):
                 f"Expected shape: {expected_shape}, got: {feature.shape[1:]} at output IDX: {idx}"
         
         return tuple(out_features)
+
+@registry.BACKBONES.register('basic')
+def basic(cfg, pretrained=True):
+    model = BasicModel(cfg)
+    
+    return model

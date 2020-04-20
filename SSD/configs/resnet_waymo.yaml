@@ -1,0 +1,34 @@
+MODEL:
+    NUM_CLASSES: 5
+    BACKBONE:
+        NAME: 'resnet'
+        PRETRAINED: True
+        #OUT_CHANNELS: [128, 256, 128, 128, 64, 64]
+        #OUT_CHANNELS: [256, 512, 256, 256, 128, 128]
+        OUT_CHANNELS: [256, 512, 512, 256, 256, 256]
+        INPUT_CHANNELS: 3
+    PRIORS:
+        #FEATURE_MAPS: [ [38, 38], [19, 19], [10, 10], [5, 5], [3, 3], [1, 1]]
+        FEATURE_MAPS: [ [40, 30], [20, 15], [10, 8], [5, 4], [3, 2], [1, 1]]
+        STRIDES: [[8, 8], [16, 16], [32, 30], [64, 60], [107, 120], [320, 240]]
+        #cfg.MODEL.PRIORS.STRIDES = [8, 16, 32, 64, 100, 300]
+        #MIN_SIZES: [[30], [60], [111], [162], [213], [264]]
+        #MAX_SIZES: [[60], [111], [162], [213], [264], [315]]
+        #MIN_SIZES: [[30, 30], [60, 60], [111, 82], [168, 120], [216, 160], [284, 200]]
+        #MAX_SIZES: [[66, 70], [121, 92], [172, 130], [223, 170], [274, 210], [335, 300]]
+INPUT:
+    #IMAGE_SIZE: [300, 300]
+    IMAGE_SIZE: [320, 240]
+DATASETS:
+    TRAIN: ("waymo_train",)
+    TEST: ("waymo_val", )
+SOLVER:
+    MAX_ITER: 30_000
+    LR_STEPS: [80000, 100000]
+    GAMMA: 0.1
+    BATCH_SIZE: 16
+    LR: 1e-3
+DATA_LOADER:
+    NUM_WORKERS: 4
+OUTPUT_DIR: 'outputs/basic'
+DATASET_DIR: "datasets"

@@ -1,6 +1,8 @@
+"""
 from torch import nn
 from ssd.modeling.backbone.vgg import VGG
 from ssd.modeling.backbone.basic import BasicModel
+from ssd.modeling.backbone.efficient_net.efficient_net import EfficientNet
 from ssd.modeling.box_head.box_head import SSDBoxHead
 from ssd.utils.model_zoo import load_state_dict_from_url
 from ssd import torch_utils
@@ -34,6 +36,9 @@ def build_backbone(cfg):
     if backbone_name == "basic":
         model = BasicModel(cfg)
         return model
+    if backbone_name == "efficient_net-b3":
+        model = EfficientNet(cfg)
+        return model
     if backbone_name == "vgg":
         model = VGG(cfg)
         if cfg.MODEL.BACKBONE.PRETRAINED:
@@ -41,3 +46,24 @@ def build_backbone(cfg):
                 "https://s3.amazonaws.com/amdegroot-models/vgg16_reducedfc.pth")
             model.init_from_pretrain(state_dict)
         return model
+"""    
+# new method
+from torch import nn
+
+from ssd.modeling.backbone import build_backbone
+from ssd.modeling.box_head import build_box_head
+
+
+class SSDDetector(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.cfg = cfg
+        self.backbone = build_backbone(cfg)
+        self.box_head = build_box_head(cfg)
+
+    def forward(self, images, targets=None):
+        features = self.backbone(images)
+        detections, detector_losses = self.box_head(features, targets)
+        if self.training:
+            return detector_losses
+        return detections

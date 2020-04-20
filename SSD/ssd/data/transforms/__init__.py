@@ -1,4 +1,4 @@
-from ssd.modeling.box_head.prior_box import PriorBox
+from ssd.modeling.anchors.prior_box import PriorBox
 from .target_transform import SSDTargetTransform
 from .transforms import *
 
