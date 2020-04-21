@@ -49,7 +49,7 @@ def cache_url(url, model_dir=None, progress=True):
         # if the hash_prefix is less than 6 characters
         if len(hash_prefix) < 6:
             hash_prefix = None
-    _download_url_to_file(url, cached_file, hash_prefix, progress=progress)
+    download_url_to_file(url, cached_file, hash_prefix, progress=progress)
 
 
 def load_state_dict_from_url(url, map_location='cpu'):

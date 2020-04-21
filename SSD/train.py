@@ -19,7 +19,7 @@ def start_train(cfg):
     model = SSDDetector(cfg)
     model = torch_utils.to_cuda(model)
 
-    lr = cfg.SOLVER.LR 
+    lr = cfg.SOLVER.LR
     optimizer = make_optimizer(cfg, model, lr)
 
     milestones = [step for step in cfg.SOLVER.LR_STEPS]
