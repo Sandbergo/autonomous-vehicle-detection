@@ -19,19 +19,36 @@ class ResNet(nn.Module):
 
         resnet = models.resnet34(pretrained=cfg.MODEL.BACKBONE.PRETRAINED)
         
-        self.resnet = nn.Sequential(*list(resnet.children())[:8])
+        # To run 640x480: Stride = 2 on line 24
+
+        self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0)))
+        print(*list(resnet.children()))
+        
+        
+        # Freeze layers
+        ct = 0
+        for child in resnet.children():
+            ct += 1
+            if ct < 4:
+                for param in self.resnet.parameters():
+                    param.requires_grad = False
+
+
         
         self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0) # hukk old 
         
-        conv4_block1 = self.resnet[-1][0]
+        # To run 640x480; Change index below from -1 to -2. Because we added the extra conv layer above
+        conv4_block1 = self.resnet[-2][0]
         conv4_block1.conv1.stride = (1, 1)
         conv4_block1.conv2.stride = (1, 1)
         conv4_block1.downsample[0].stride = (1, 1)
+
 
         self.additional_layers = self.add_additional_layers()
 
     def add_additional_layers(self):
         layers = nn.ModuleList()
+
        
         """
         for i in range(len(self.output_feature_size) - 2):
@@ -50,6 +67,10 @@ class ResNet(nn.Module):
             nn.Conv2d(self.output_channels[-2], self.output_channels[-1], kernel_size=(2,3), stride=2, padding=0)
         ))
         """
+        #layers.append(nn.Sequential(
+        #    nn.Conv2d(self.output_channels[0], self.output_channels[0], kernel_size=1, stride=2, padding=0)
+        #))
+        #print("hey")
         for i in range(len(self.output_feature_size) - 2):
             layers.append(nn.Sequential(
                 nn.ELU(inplace=False),

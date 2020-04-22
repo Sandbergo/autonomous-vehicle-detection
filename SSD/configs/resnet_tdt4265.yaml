@@ -2,7 +2,7 @@ MODEL:
     NUM_CLASSES: 5
     BACKBONE:
         NAME: 'resnet'
-        PRETRAINED: True
+        PRETRAINED: False
         #OUT_CHANNELS: [128, 256, 128, 128, 64, 64]
         #OUT_CHANNELS: [256, 512, 256, 256, 128, 128]
         OUT_CHANNELS: [256, 512, 256, 256, 128, 64] # hukk
@@ -34,5 +34,7 @@ SOLVER:
     LR: 1e-3
 DATA_LOADER:
     NUM_WORKERS: 4
-OUTPUT_DIR: 'outputs/basic'
+OUTPUT_DIR: 'outputs/resnet'
+EVAL_STEP: 500
+MODEL_SAVE_STEP: 500
 DATASET_DIR: "datasets"
