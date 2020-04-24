@@ -18,25 +18,26 @@ class ResNet(nn.Module):
         # https://github.com/pytorch/vision/blob/7b60f4db9707d7afdbb87fd4e8ef6906ca014720/torchvision/models/resnet.py#L35
 
         resnet = models.resnet34(pretrained=cfg.MODEL.BACKBONE.PRETRAINED)
-        
+
         # To run 640x480: Stride = 2 on line 24
 
+        # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0)))
         self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0)))
         print(*list(resnet.children()))
-        
-        
+
+
         # Freeze layers
-        ct = 0
-        for child in resnet.children():
-            ct += 1
-            if ct < 4:
-                for param in self.resnet.parameters():
-                    param.requires_grad = False
+        # ct = 0
+        # for child in resnet.children():
+        #     ct += 1
+        #     if ct < 4:
+        #         for param in self.resnet.parameters():
+        #             param.requires_grad = False
 
 
-        
-        self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0) # hukk old 
-        
+
+        self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0) # hukk old
+
         # To run 640x480; Change index below from -1 to -2. Because we added the extra conv layer above
         conv4_block1 = self.resnet[-2][0]
         conv4_block1.conv1.stride = (1, 1)
@@ -49,7 +50,7 @@ class ResNet(nn.Module):
     def add_additional_layers(self):
         layers = nn.ModuleList()
 
-       
+
         """
         for i in range(len(self.output_feature_size) - 2):
             layers.append(nn.Sequential(
@@ -94,7 +95,7 @@ class ResNet(nn.Module):
             nn.BatchNorm2d(self.output_channels[-2]),
             nn.Conv2d(self.output_channels[-2], self.output_channels[-1], kernel_size=(2,3), stride=2, padding=0)
         ))
-        
+
 
         return layers
 
@@ -108,8 +109,9 @@ class ResNet(nn.Module):
             torch.Size([out_ch[3], out_feat[3][1], out_feat[3][0]]),
             torch.Size([out_ch[4], out_feat[4][1], out_feat[4][0]]),
             torch.Size([out_ch[5], out_feat[5][1], out_feat[5][0]])]
-        
+
         x = self.resnet(x)
+        print("features: ", x.shape)
         features = [x]
         for layer in self.additional_layers:
             x = layer(x)
@@ -120,7 +122,7 @@ class ResNet(nn.Module):
             expected_shape = feature_map_size_list[idx]
             assert feature.shape[1:] == expected_shape, \
                 f"Expected shape: {expected_shape}, got: {feature.shape[1:]} at output IDX: {idx}"
-        
+
         return tuple(features)
 
 
@@ -141,7 +143,7 @@ class BasicBlock(nn.Module):
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
                  base_width=64, dilation=1, norm_layer=nn.BatchNorm2d):
         super(BasicBlock, self).__init__()
-        
+
         downsample = nn.Sequential(
             conv1x1(inplanes, planes, stride),
             norm_layer(planes),
@@ -200,10 +202,10 @@ def make_layer(self, block, planes, blocks, stride=1, dilate=False):
 
 
 
-        
+
 
 @registry.BACKBONES.register('resnet')
 def resnet(cfg, pretrained=True):
     model = ResNet(cfg)
-    
+
     return model
