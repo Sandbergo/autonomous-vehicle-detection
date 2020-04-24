@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 from torchvision import models
 from ssd.modeling import registry
+from efficientnet_pytorch import EfficientNet as EffNet
 
 class ResNet(nn.Module):
     def __init__(self, cfg):
@@ -16,26 +17,42 @@ class ResNet(nn.Module):
         # https://github.com/NVIDIA/DeepLearningExamples/blob/master/PyTorch/Detection/SSD/src/model.py
         # extra block implementation taken from
         # https://github.com/pytorch/vision/blob/7b60f4db9707d7afdbb87fd4e8ef6906ca014720/torchvision/models/resnet.py#L35
-
+        
         resnet = models.resnet34(pretrained=cfg.MODEL.BACKBONE.PRETRAINED)
+       
+        self.resnet = nn.Sequential(*list(resnet.children())[:8])
+        
+        self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0) # hukk old 
+        
+        conv4_block1 = self.resnet[-1][0]
+        conv4_block1.conv1.stride = (1, 1)
+        conv4_block1.conv2.stride = (1, 1)
+        conv4_block1.downsample[0].stride = (1, 1)
+
+        self.resnet = nn.Sequential(*list(self.resnet.children()), 
+                    BasicBlock(inplanes = 512, planes = 512, stride=2)) # BasicBlock(inplanes = 512, planes = 512, stride=2),
+        
+        self.additional_layers = self.add_additional_layers()
+        print(self.resnet)
+        
         """
-        resnet.relu = nn.ELU(inplace=True)
-        resnet.layer1[0].relu = nn.ELU(inplace=True)
-        resnet.layer1[1].relu = nn.ELU(inplace=True)
-        resnet.layer1[2].relu = nn.ELU(inplace=True)
-        resnet.layer2[0].relu = nn.ELU(inplace=True)
-        resnet.layer2[1].relu = nn.ELU(inplace=True)
-        resnet.layer2[2].relu = nn.ELU(inplace=True)
-        resnet.layer2[3].relu = nn.ELU(inplace=True)
-        resnet.layer3[0].relu = nn.ELU(inplace=True)
-        resnet.layer3[1].relu = nn.ELU(inplace=True)
-        resnet.layer3[2].relu = nn.ELU(inplace=True)
-        resnet.layer3[3].relu = nn.ELU(inplace=True)
-        resnet.layer3[4].relu = nn.ELU(inplace=True)
-        resnet.layer3[5].relu = nn.ELU(inplace=True)
-        resnet.layer4[0].relu = nn.ELU(inplace=True)
-        resnet.layer4[1].relu = nn.ELU(inplace=True)
-        resnet.layer4[2].relu = nn.ELU(inplace=True)
+        resnet.relu = nn.LeakyReLU(inplace=True)
+        resnet.layer1[0].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer1[1].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer1[2].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer2[0].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer2[1].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer2[2].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer2[3].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer3[0].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer3[1].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer3[2].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer3[3].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer3[4].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer3[5].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer4[0].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer4[1].relu = nn.LeakyReLU(inplace=True)
+        resnet.layer4[2].relu = nn.LeakyReLU(inplace=True)
         """
 
         self.resnet = nn.Sequential(*list(resnet.children())[:8])
@@ -62,41 +79,8 @@ class ResNet(nn.Module):
                  BasicBlock(inplanes = self.output_channels[i], planes = self.output_channels[i+1], stride=2)
             ))
         layers.append(nn.Sequential(
-            nn.ELU(inplace=False),
-            nn.BatchNorm2d(self.output_channels[-2]),
-            nn.Conv2d(self.output_channels[-2], self.output_channels[-2], kernel_size=3, stride=1, padding=1),
-            nn.ELU(inplace=False),
-            nn.BatchNorm2d(self.output_channels[-2]),
-            nn.Conv2d(self.output_channels[-2], self.output_channels[-2], kernel_size=3, stride=1, padding=1),
-            nn.ELU(inplace=False),
-            nn.BatchNorm2d(self.output_channels[-2]),
-            nn.Conv2d(self.output_channels[-2], self.output_channels[-1], kernel_size=3, stride=2, padding=0)
+            EndBlock(inplanes = self.output_channels[i+1], planes = self.output_channels[i+2], stride=2)
         ))
-        """
-        for i in range(len(self.output_feature_size) - 2):
-            layers.append(nn.Sequential(
-                nn.ELU(inplace=False),
-                nn.BatchNorm2d(self.output_channels[i]),
-                nn.Conv2d(self.output_channels[i], self.output_channels[i], kernel_size=3, stride=1, padding=1),
-                nn.ELU(inplace=False),
-                nn.BatchNorm2d(self.output_channels[i]),
-                nn.Conv2d(self.output_channels[i], self.output_channels[i], kernel_size=3, stride=1, padding=1),
-                nn.ELU(inplace=False),
-                nn.BatchNorm2d(self.output_channels[i]),
-                nn.Conv2d(self.output_channels[i], self.output_channels[i + 1], kernel_size=3, stride=2, padding=1)
-            ))
-        layers.append(nn.Sequential(
-            nn.ELU(inplace=False),
-            nn.BatchNorm2d(self.output_channels[-2]),
-            nn.Conv2d(self.output_channels[-2], self.output_channels[-2], kernel_size=3, stride=1, padding=1),
-            nn.ELU(inplace=False),
-            nn.BatchNorm2d(self.output_channels[-2]),
-            nn.Conv2d(self.output_channels[-2], self.output_channels[-2], kernel_size=3, stride=1, padding=1),
-            nn.ELU(inplace=False),
-            nn.BatchNorm2d(self.output_channels[-2]),
-            nn.Conv2d(self.output_channels[-2], self.output_channels[-1], kernel_size=(2,3), stride=2, padding=0)
-        ))
-        """
         
 
         return layers
@@ -111,7 +95,7 @@ class ResNet(nn.Module):
             torch.Size([out_ch[3], out_feat[3][1], out_feat[3][0]]),
             torch.Size([out_ch[4], out_feat[4][1], out_feat[4][0]]),
             torch.Size([out_ch[5], out_feat[5][1], out_feat[5][0]])]
-        
+
         x = self.resnet(x)
         features = [x]
         for layer in self.additional_layers:
@@ -170,11 +154,11 @@ class BasicBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
-        """
+        
         out = self.elu(out)
         out = self.conv3(out)
         out = self.bn3(out)
-        """
+        
         if self.downsample is not None:
             identity = self.downsample(x)
 
@@ -183,31 +167,50 @@ class BasicBlock(nn.Module):
 
         return out
 
-def make_layer(self, block, planes, blocks, stride=1, dilate=False):
-    norm_layer = self._norm_layer
-    downsample = None
-    previous_dilation = self.dilation
-    if dilate:
-        self.dilation *= stride
-        stride = 1
-    if stride != 1 or self.inplanes != planes * block.expansion:
-        downsample = nn.Sequential(
-            conv1x1(self.inplanes, planes * block.expansion, stride),
-            norm_layer(planes * block.expansion),
-        )
+class EndBlock(nn.Module):
+    expansion = 1
 
-    layers = []
-    layers.append(block(self.inplanes, planes, stride, downsample, self.groups,
-                        self.base_width, previous_dilation, norm_layer))
-    self.inplanes = planes * block.expansion
-    for _ in range(1, blocks):
-        layers.append(block(self.inplanes, planes, groups=self.groups,
-                            base_width=self.base_width, dilation=self.dilation,
-                            norm_layer=norm_layer))
-
-    return nn.Sequential(*layers)
-
+    def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
+                 base_width=64, dilation=1, norm_layer=nn.BatchNorm2d):
+        super(EndBlock, self).__init__()
         
+        downsample = nn.Sequential(
+            conv1x1(inplanes, planes, stride),
+            norm_layer(planes),
+        )
+        self.planes= planes
+        self.inplanes = inplanes
+
+        self.conv1 = conv3x3(inplanes, planes, )
+        self.bn1 = norm_layer(planes)
+        self.elu = nn.ELU(inplace=True)
+        self.conv2 = conv3x3(planes, planes)
+        self.bn2 = norm_layer(planes)
+        self.conv3 = nn.Conv2d(self.inplanes, self.planes, kernel_size=(2,3), stride=2, padding=0)
+        self.bn3 = norm_layer(planes)
+        self.downsample = nn.Upsample((1,1))
+        self.stride = stride
+
+    def forward(self, x):
+        identity = x
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.elu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.elu(out)
+        out = self.conv3(out)
+        
+        if self.downsample is not None:
+            identity = self.downsample(identity)
+
+        out += identity
+        out = self.elu(out)
+
+        return out
+
 
 @registry.BACKBONES.register('resnet')
 def resnet(cfg, pretrained=True):

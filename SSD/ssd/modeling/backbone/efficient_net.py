@@ -173,7 +173,7 @@ class Classifier(nn.Module):
 class EfficientNet(nn.Module):
     def __init__(self, cfg):
         super(EfficientNet, self).__init__()
-        model = EffNet.from_pretrained('efficientnet-b0')
+        model = EffNet.from_pretrained('efficientnet-b6')
         self.output_channels = cfg.MODEL.BACKBONE.OUT_CHANNELS
         image_channels = cfg.MODEL.BACKBONE.INPUT_CHANNELS
         self.output_feature_size = cfg.MODEL.PRIORS.FEATURE_MAPS
@@ -183,13 +183,13 @@ class EfficientNet(nn.Module):
         del model._dropout
         del model._fc
         self.model = model
-        self.model = nn.Sequential(*list(self.model.children()), 
-                    BasicBlock(inplanes = 24, planes = 64, stride=2),
-                    BasicBlock(inplanes = 64, planes = 128, stride=2))
+        #self.model=self.model.add(BasicBlock(inplanes = 56, planes = 128, stride=2))
         
 
     def forward(self, x):
         x = self.model._swish(self.model._bn0(self.model._conv_stem(x)))
+        #x = (x)
+        
         feature_maps = []
         for idx, block in enumerate(self.model._blocks):
             drop_connect_rate = self.model._global_params.drop_connect_rate
@@ -199,6 +199,8 @@ class EfficientNet(nn.Module):
             if block._depthwise_conv.stride == [2, 2]:
                 feature_maps.append(x)
         
+
+
         out_ch = self.output_channels
         out_feat = self.output_feature_size
         feature_map_size_list = [
@@ -210,15 +212,15 @@ class EfficientNet(nn.Module):
             torch.Size([out_ch[5], out_feat[5][1], out_feat[5][0]])]
         
 
-        for idx, feature in enumerate(feature_maps):
+        for idx, feature in enumerate(feature_maps[1:]):
             out_channel = feature_maps[idx]
             expected_shape = feature_map_size_list[idx]
             assert feature.shape[1:] == expected_shape, \
                 f"Expected shape: {expected_shape}, got: {feature.shape[1:]} at output IDX: {idx}"
-        
-        return tuple(features)
+        print(len(feature_maps))
+        return tuple(feature_maps[1:])
 
-        return feature_maps[1:]
+        #return feature_maps[1:]
 
 
 
