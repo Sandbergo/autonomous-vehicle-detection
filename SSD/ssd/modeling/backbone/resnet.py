@@ -18,7 +18,26 @@ class ResNet(nn.Module):
         # https://github.com/pytorch/vision/blob/7b60f4db9707d7afdbb87fd4e8ef6906ca014720/torchvision/models/resnet.py#L35
 
         resnet = models.resnet34(pretrained=cfg.MODEL.BACKBONE.PRETRAINED)
-        
+        """
+        resnet.relu = nn.ELU(inplace=True)
+        resnet.layer1[0].relu = nn.ELU(inplace=True)
+        resnet.layer1[1].relu = nn.ELU(inplace=True)
+        resnet.layer1[2].relu = nn.ELU(inplace=True)
+        resnet.layer2[0].relu = nn.ELU(inplace=True)
+        resnet.layer2[1].relu = nn.ELU(inplace=True)
+        resnet.layer2[2].relu = nn.ELU(inplace=True)
+        resnet.layer2[3].relu = nn.ELU(inplace=True)
+        resnet.layer3[0].relu = nn.ELU(inplace=True)
+        resnet.layer3[1].relu = nn.ELU(inplace=True)
+        resnet.layer3[2].relu = nn.ELU(inplace=True)
+        resnet.layer3[3].relu = nn.ELU(inplace=True)
+        resnet.layer3[4].relu = nn.ELU(inplace=True)
+        resnet.layer3[5].relu = nn.ELU(inplace=True)
+        resnet.layer4[0].relu = nn.ELU(inplace=True)
+        resnet.layer4[1].relu = nn.ELU(inplace=True)
+        resnet.layer4[2].relu = nn.ELU(inplace=True)
+        """
+
         self.resnet = nn.Sequential(*list(resnet.children())[:8])
         
         self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0) # hukk old 
@@ -28,12 +47,16 @@ class ResNet(nn.Module):
         conv4_block1.conv2.stride = (1, 1)
         conv4_block1.downsample[0].stride = (1, 1)
 
+        self.resnet = nn.Sequential(*list(self.resnet.children()), 
+                    BasicBlock(inplanes = 512, planes = 512, stride=2)) # BasicBlock(inplanes = 512, planes = 512, stride=2),
+        
         self.additional_layers = self.add_additional_layers()
+        print(self.resnet)
 
     def add_additional_layers(self):
         layers = nn.ModuleList()
-       
-        """
+
+        
         for i in range(len(self.output_feature_size) - 2):
             layers.append(nn.Sequential(
                  BasicBlock(inplanes = self.output_channels[i], planes = self.output_channels[i+1], stride=2)
@@ -47,7 +70,7 @@ class ResNet(nn.Module):
             nn.Conv2d(self.output_channels[-2], self.output_channels[-2], kernel_size=3, stride=1, padding=1),
             nn.ELU(inplace=False),
             nn.BatchNorm2d(self.output_channels[-2]),
-            nn.Conv2d(self.output_channels[-2], self.output_channels[-1], kernel_size=(2,3), stride=2, padding=0)
+            nn.Conv2d(self.output_channels[-2], self.output_channels[-1], kernel_size=3, stride=2, padding=0)
         ))
         """
         for i in range(len(self.output_feature_size) - 2):
@@ -73,6 +96,7 @@ class ResNet(nn.Module):
             nn.BatchNorm2d(self.output_channels[-2]),
             nn.Conv2d(self.output_channels[-2], self.output_channels[-1], kernel_size=(2,3), stride=2, padding=0)
         ))
+        """
         
 
         return layers
@@ -128,9 +152,11 @@ class BasicBlock(nn.Module):
 
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = norm_layer(planes)
-        self.relu = nn.ReLU(inplace=True)
+        self.elu = nn.ELU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
         self.bn2 = norm_layer(planes)
+        self.conv3 = conv3x3(planes, planes)
+        self.bn3 = norm_layer(planes)
         self.downsample = downsample
         self.stride = stride
 
@@ -139,16 +165,21 @@ class BasicBlock(nn.Module):
 
         out = self.conv1(x)
         out = self.bn1(out)
-        out = self.relu(out)
+        out = self.elu(out)
 
         out = self.conv2(out)
         out = self.bn2(out)
 
+        """
+        out = self.elu(out)
+        out = self.conv3(out)
+        out = self.bn3(out)
+        """
         if self.downsample is not None:
             identity = self.downsample(x)
 
         out += identity
-        out = self.relu(out)
+        out = self.elu(out)
 
         return out
 
@@ -175,9 +206,6 @@ def make_layer(self, block, planes, blocks, stride=1, dilate=False):
                             norm_layer=norm_layer))
 
     return nn.Sequential(*layers)
-
-
-
 
         
 
