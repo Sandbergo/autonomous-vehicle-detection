@@ -55,20 +55,7 @@ class ResNet(nn.Module):
         resnet.layer4[2].relu = nn.LeakyReLU(inplace=True)
         """
 
-        self.resnet = nn.Sequential(*list(resnet.children())[:8])
-        
-        self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0) # hukk old 
-        
-        conv4_block1 = self.resnet[-1][0]
-        conv4_block1.conv1.stride = (1, 1)
-        conv4_block1.conv2.stride = (1, 1)
-        conv4_block1.downsample[0].stride = (1, 1)
-
-        self.resnet = nn.Sequential(*list(self.resnet.children()), 
-                    BasicBlock(inplanes = 512, planes = 512, stride=2)) # BasicBlock(inplanes = 512, planes = 512, stride=2),
-        
-        self.additional_layers = self.add_additional_layers()
-        print(self.resnet)
+        return
 
     def add_additional_layers(self):
         layers = nn.ModuleList()
