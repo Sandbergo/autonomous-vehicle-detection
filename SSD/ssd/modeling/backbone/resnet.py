@@ -133,7 +133,7 @@ class ResNet(nn.Module):
             torch.Size([out_ch[5], out_feat[5][1], out_feat[5][0]])]
 
         x = self.resnet(x)
-        print("features: ", x.shape)
+        #print("features: ", x.shape)
         features = [x]
         for layer in self.additional_layers:
             x = layer(x)
