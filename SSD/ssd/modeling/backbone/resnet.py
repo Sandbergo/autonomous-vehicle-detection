@@ -21,8 +21,10 @@ class ResNet(nn.Module):
 
         # To run 640x480: Stride = 2 on line 24
 
-        # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0)))
-        self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0)))
+        self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0), nn.Upsample(size=(30, 40), mode='bilinear')))
+        # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=5, dilation=5, stride=1, padding=1)))
+        # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=3, stride=2, padding=0)), nn.Sequential(nn.Conv2d(512,512,kernel_size=5, stride=1, dilation = 5, padding=0)))
+
         print(*list(resnet.children()))
 
 
@@ -35,7 +37,6 @@ class ResNet(nn.Module):
         #             param.requires_grad = False
 
 
-
         self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0) # hukk old
 
         # To run 640x480; Change index below from -1 to -2. Because we added the extra conv layer above
@@ -46,6 +47,26 @@ class ResNet(nn.Module):
 
 
         self.additional_layers = self.add_additional_layers()
+
+        """
+        resnet.relu = nn.ELU(inplace=True)
+        resnet.layer1[0].relu = nn.ELU(inplace=True)
+        resnet.layer1[1].relu = nn.ELU(inplace=True)
+        resnet.layer1[2].relu = nn.ELU(inplace=True)
+        resnet.layer2[0].relu = nn.ELU(inplace=True)
+        resnet.layer2[1].relu = nn.ELU(inplace=True)
+        resnet.layer2[2].relu = nn.ELU(inplace=True)
+        resnet.layer2[3].relu = nn.ELU(inplace=True)
+        resnet.layer3[0].relu = nn.ELU(inplace=True)
+        resnet.layer3[1].relu = nn.ELU(inplace=True)
+        resnet.layer3[2].relu = nn.ELU(inplace=True)
+        resnet.layer3[3].relu = nn.ELU(inplace=True)
+        resnet.layer3[4].relu = nn.ELU(inplace=True)
+        resnet.layer3[5].relu = nn.ELU(inplace=True)
+        resnet.layer4[0].relu = nn.ELU(inplace=True)
+        resnet.layer4[1].relu = nn.ELU(inplace=True)
+        resnet.layer4[2].relu = nn.ELU(inplace=True)
+        """
 
     def add_additional_layers(self):
         layers = nn.ModuleList()
@@ -111,7 +132,7 @@ class ResNet(nn.Module):
             torch.Size([out_ch[5], out_feat[5][1], out_feat[5][0]])]
 
         x = self.resnet(x)
-        print("features: ", x.shape)
+        # print("features: ", x.shape)
         features = [x]
         for layer in self.additional_layers:
             x = layer(x)

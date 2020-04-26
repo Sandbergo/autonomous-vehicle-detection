@@ -47,7 +47,7 @@ SOLVER:
     LR: 1e-3
 DATA_LOADER:
     NUM_WORKERS: 4
-OUTPUT_DIR: 'outputs/resnet_960x720'
+OUTPUT_DIR: 'outputs/resnet_960x720_elu_3conv'
 EVAL_STEP: 500
 MODEL_SAVE_STEP: 500
 DATASET_DIR: "datasets"
