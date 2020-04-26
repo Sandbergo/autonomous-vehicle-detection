@@ -31,13 +31,13 @@ INPUT:
     #IMAGE_SIZE: [300, 300]
     IMAGE_SIZE: [960, 720]
 DATASETS:
-    TRAIN: ("tdt4265_train",)
+    TRAIN: ("tdt4265_train", "waymo_train", "waymo_val")
     TEST: ("tdt4265_val", )
 SOLVER:
     MAX_ITER: 20_000
     LR_STEPS: [80000, 100000]
     GAMMA: 0.1
-    BATCH_SIZE: 4
+    BATCH_SIZE: 1
     LR: 1e-3
 DATA_LOADER:
     NUM_WORKERS: 4
