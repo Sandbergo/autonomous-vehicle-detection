@@ -21,7 +21,8 @@ class ResNet(nn.Module):
 
         # To run 640x480: Stride = 2 on line 24
 
-        self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0), nn.Upsample(size=(30, 40), mode='bilinear')))
+        self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=5, stride=3, padding=24, dilation=1)))
+        # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0), nn.Upsample(size=(30, 40), mode='bilinear')))
         # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=5, dilation=5, stride=1, padding=1)))
         # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=3, stride=2, padding=0)), nn.Sequential(nn.Conv2d(512,512,kernel_size=5, stride=1, dilation = 5, padding=0)))
 
