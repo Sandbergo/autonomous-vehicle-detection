@@ -21,11 +21,12 @@ class ResNet(nn.Module):
 
         # To run 640x480: Stride = 2 on line 24
 
-        self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0), nn.Upsample(size=(30, 40), mode='bilinear')))
+        self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=5, stride=3, padding=1, dilation=1)))
+        #self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=1, stride=2, padding=0), nn.Upsample(size=(30, 40), mode='bilinear')))
         # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=5, dilation=5, stride=1, padding=1)))
         # self.resnet = nn.Sequential(*list(resnet.children())[:8], nn.Sequential(nn.Conv2d(512,512,kernel_size=3, stride=2, padding=0)), nn.Sequential(nn.Conv2d(512,512,kernel_size=5, stride=1, dilation = 5, padding=0)))
 
-        print(*list(resnet.children()))
+        #print(*list(resnet.children()))
 
 
         # Freeze layers
@@ -132,7 +133,7 @@ class ResNet(nn.Module):
             torch.Size([out_ch[5], out_feat[5][1], out_feat[5][0]])]
 
         x = self.resnet(x)
-        # print("features: ", x.shape)
+        print("features: ", x.shape)
         features = [x]
         for layer in self.additional_layers:
             x = layer(x)
