@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 from torchvision import models
 from ssd.modeling import registry
-from efficientnet_pytorch import EfficientNet as EffNet
+#from efficientnet_pytorch import EfficientNet as EffNet
 
 class ResNet(nn.Module):
     def __init__(self, cfg):
@@ -138,7 +138,7 @@ class BeginBlock(nn.Module):
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
                  base_width=64, dilation=1, norm_layer=nn.BatchNorm2d):
-        super(BasicBlock, self).__init__()
+        super(BeginBlock, self).__init__()
 
         downsample = nn.Sequential(
             conv1x1(inplanes, planes, stride),
@@ -146,7 +146,7 @@ class BeginBlock(nn.Module):
         )
 
         # self.conv1 = conv3x3(inplanes, planes, stride)
-        self.conv1 = nn.Conv2d(self.inplanes, self.planes, stride=3, padding=1, kernal_size=5)
+        self.conv1 = nn.Conv2d(inplanes, planes, stride=3, padding=1, kernel_size=5)
         # self.conv3 = nn.Conv2d(self.inplanes, self.planes, kernel_size=(2,3), stride=2, padding=0)
         self.bn1 = norm_layer(planes)
         self.elu = nn.ELU(inplace=True)
