@@ -35,10 +35,15 @@ sshpass -p $PASSWORD scp \
         $INFERENCE_COMPUTER:/work/"$USER"/autonomous-vehicle-detection/SSD/outputs/resnet_960x720_nonUpsample/"$MODEL_PTH"
 
 # Copying last_checkpoint.txt file from clab15 to clab11
-echo 'copying last_checkpoint file from 15 to 11'
-sshpass -p $PASSWORD scp \
-        $MODEL_COMPUTER:/work/"$USER"/autonomous-vehicle-detection/SSD/outputs/resnet_960x720_nonUpsample/last_checkpoint.txt  \
-        $INFERENCE_COMPUTER:/work/"$USER"/autonomous-vehicle-detection/SSD/outputs/resnet_960x720_nonUpsample/last_checkpoint.txt
+# echo 'copying last_checkpoint file from 15 to 11'
+# sshpass -p $PASSWORD scp \
+#         $MODEL_COMPUTER:/work/"$USER"/autonomous-vehicle-detection/SSD/outputs/resnet_960x720_nonUpsample/last_checkpoint.txt  \
+#         $INFERENCE_COMPUTER:/work/"$USER"/autonomous-vehicle-detection/SSD/outputs/resnet_960x720_nonUpsample/last_checkpoint.txt
+
+# Copying last_checkpoint.txt file from clab15 to clab11
+echo 'creating last_checkpoint file'
+sshpass -p $PASSWORD ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no $INFERENCE_COMPUTER \
+        "echo outputs/resnet_960x720_nonUpsample/$MODEL_PTH > /work/"$USER"/autonomous-vehicle-detection/SSD/outputs/resnet_960x720_nonUpsample/last_checkpoint.txt"
 
 # Running submit_results
 echo 'running submit results'
