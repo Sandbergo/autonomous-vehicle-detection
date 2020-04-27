@@ -3,13 +3,13 @@
 set -e
 
 # Usage:
-# bash remote_submit_script <username> <password> <iteration_of_model.pth>
+# bash remote_submit_script <username> <password> <iteration_number>
 
 if ! [ -x "$(command -v sshpass)" ]; then
     echo 'sshpass is not installed, updating before installing'
     # sudo pacman -S sshpass
-    # sudo apt-get update
-    # sudo apt-get install sshpass
+    sudo apt-get update
+    sudo apt-get install sshpass
 fi
 
 #Setting up clab strings
@@ -20,6 +20,7 @@ MODEL_PTH="model_0"$IT_NUMBER".pth"
 MODEL_COMPUTER="$USER@clab15.idi.ntnu.no"
 INFERENCE_COMPUTER="$USER@clab11.idi.ntnu.no"
 
+# To verify correct strings
 echo "$USER"
 echo "$PASSWORD"
 echo "$IT_NUMBER"
