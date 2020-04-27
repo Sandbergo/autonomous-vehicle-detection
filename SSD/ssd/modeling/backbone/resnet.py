@@ -1,9 +1,8 @@
 import torch.nn as nn
 import torch
-import torch.nn.functional as F
+# import torch.nn.functional as F
 from torchvision import models
 from ssd.modeling import registry
-#from efficientnet_pytorch import EfficientNet as EffNet
 
 class ResNet(nn.Module):
     def __init__(self, cfg):
@@ -22,7 +21,7 @@ class ResNet(nn.Module):
 
         self.resnet = nn.Sequential(*list(resnet.children())[:8])
 
-        self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0) # hukk old
+        self.resnet[3] = nn.MaxPool2d(kernel_size=1, stride=1, padding=0)
 
         conv4_block1 = self.resnet[-1][0]
         conv4_block1.conv1.stride = (1, 1)
@@ -30,7 +29,7 @@ class ResNet(nn.Module):
         conv4_block1.downsample[0].stride = (1, 1)
 
         self.resnet = nn.Sequential(*list(self.resnet.children()),
-                    BeginBlock(inplanes = 512, planes = 512, stride=3)) # BasicBlock(inplanes = 512, planes = 512, stride=2),
+                    BeginBlock(inplanes = 512, planes = 512, stride=3))
 
         self.additional_layers = self.add_additional_layers()
         print(self.resnet)
@@ -38,6 +37,7 @@ class ResNet(nn.Module):
         return
 
     def add_additional_layers(self):
+        """Feature Extractor layers"""
         layers = nn.ModuleList()
 
         for i in range(len(self.output_feature_size) - 2):
@@ -52,6 +52,7 @@ class ResNet(nn.Module):
         return layers
 
     def forward(self, x):
+        """Forward Pass, asserting feature map sizes are as specified in cfg"""
         out_ch = self.output_channels
         out_feat = self.output_feature_size
         feature_map_size_list = [
@@ -89,6 +90,7 @@ def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
 
 
 class BasicBlock(nn.Module):
+    """BasicBlock from ResNet-implementation"""
     expansion = 1
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
@@ -134,6 +136,7 @@ class BasicBlock(nn.Module):
         return out
 
 class BeginBlock(nn.Module):
+    """BasicBlock variant from ResNet-implementation"""
     expansion = 1
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
@@ -181,6 +184,7 @@ class BeginBlock(nn.Module):
         return out
 
 class EndBlock(nn.Module):
+    """BasicBlock variant from ResNet-implementation"""
     expansion = 1
 
     def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,

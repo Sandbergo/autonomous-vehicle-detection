@@ -23,7 +23,7 @@ Single Shot Detector for Autonomus Vehicle Vision. Detects vehicles, pedestrians
 - [Acknowledgments](#acknowledgement)
 
 ## 🧐 About <a name = "about"></a>
-Lets go bois
+Single Shot Detector for Autonomus Vehicle Vision
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
@@ -207,8 +207,6 @@ The hierarchy should look like this:
 
     
 
-## 🎈 Usage <a name="usage"></a>
-use & abuse
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 - [Python 3.7](https://www.python.org/) 

@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
+from ssd.modeling import registry
 
 
 model_urls = {
@@ -119,3 +120,9 @@ class VGG(nn.Module):
 
         return tuple(features)
 
+
+@registry.BACKBONES.register('vgg')
+def resnet(cfg, pretrained=True):
+    model = VGG(cfg)
+
+    return model
