@@ -32,7 +32,6 @@ class ResNet(nn.Module):
                     BeginBlock(inplanes = 512, planes = 512, stride=3))
 
         self.additional_layers = self.add_additional_layers()
-        print(self.resnet)
 
         return
 
