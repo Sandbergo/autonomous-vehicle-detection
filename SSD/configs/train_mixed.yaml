@@ -1,0 +1,29 @@
+MODEL:
+    NUM_CLASSES: 5
+    BACKBONE:
+        NAME: 'resnet'
+        PRETRAINED: True
+        OUT_CHANNELS: [512, 512, 512, 256, 256, 256]
+        INPUT_CHANNELS: 3
+    PRIORS:
+        FEATURE_MAPS: [[40, 30], [20, 15], [10, 8], [5, 4], [3, 2], [1, 1]]
+        STRIDES: [[24, 24], [48, 48], [96, 90], [192, 180], [321, 360], [960, 720]]         # 960x720
+        MIN_SIZES: [[90, 90], [180, 180], [333, 312], [486, 456], [684, 768], [846, 633]]   # 960x720
+        MAX_SIZES: [[180, 180], [333, 312], [486, 456], [684, 768], [846, 633], [960, 780]] # 960x720
+INPUT:
+    IMAGE_SIZE: [960, 720]
+DATASETS:
+    TRAIN: ("tdt4265_train","waymo_train", "waymo_val", )
+    TEST: ("tdt4265_val", )
+SOLVER:
+    MAX_ITER: 50_000
+    LR_STEPS: [80000, 100000]
+    GAMMA: 0.1
+    BATCH_SIZE: 4
+    LR: 1e-3
+DATA_LOADER:
+    NUM_WORKERS: 4
+OUTPUT_DIR: 'outputs/resnet'
+EVAL_STEP: 2500
+MODEL_SAVE_STEP: 2500
+DATASET_DIR: "datasets"
